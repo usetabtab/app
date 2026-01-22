@@ -1,0 +1,2309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>~</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <style>
+        :root {
+            /* Catppuccin Mocha */
+            --crust: #11111b;
+            --mantle: #181825;
+            --base: #1e1e2e;
+            --surface0: #313244;
+            --surface1: #45475a;
+            --surface2: #585b70;
+            --overlay0: #6c7086;
+            --overlay1: #7f849c;
+            --overlay2: #9399b2;
+            --subtext0: #a6adc8;
+            --subtext1: #bac2de;
+            --text: #cdd6f4;
+            --lavender: #b4befe;
+            --blue: #89b4fa;
+            --sapphire: #74c7ec;
+            --sky: #89dceb;
+            --teal: #94e2d5;
+            --green: #a6e3a1;
+            --yellow: #f9e2af;
+            --peach: #fab387;
+            --maroon: #eba0ac;
+            --red: #f38ba8;
+            --mauve: #cba6f7;
+            --pink: #f5c2e7;
+            --flamingo: #f2cdcd;
+            --rosewater: #f5e0dc;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            height: 100%;
+            overflow: hidden;
+        }
+
+        body {
+            font-family: 'JetBrains Mono', monospace;
+            background: var(--base);
+            color: var(--text);
+            opacity: 0;
+            transition: opacity 0.8s ease;
+        }
+
+        body.loaded {
+            opacity: 1;
+        }
+
+        /* Light theme - Catppuccin Latte */
+        body.light {
+            --crust: #dce0e8;
+            --mantle: #e6e9ef;
+            --base: #eff1f5;
+            --surface0: #ccd0da;
+            --surface1: #bcc0cc;
+            --surface2: #acb0be;
+            --overlay0: #9ca0b0;
+            --overlay1: #8c8fa1;
+            --overlay2: #7c7f93;
+            --subtext0: #6c6f85;
+            --subtext1: #5c5f77;
+            --text: #4c4f69;
+            --lavender: #7287fd;
+            --blue: #1e66f5;
+            --sapphire: #209fb5;
+            --sky: #04a5e5;
+            --teal: #179299;
+            --green: #40a02b;
+            --yellow: #df8e1d;
+            --peach: #fe640b;
+            --maroon: #e64553;
+            --red: #d20f39;
+            --mauve: #8839ef;
+            --pink: #ea76cb;
+            --flamingo: #dd7878;
+            --rosewater: #dc8a78;
+            background: var(--base);
+        }
+
+        /* Background */
+        #bg-pattern {
+            position: fixed;
+            inset: 0;
+            background:
+                radial-gradient(circle at 20% 80%, rgba(203, 166, 247, 0.03) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(137, 180, 250, 0.03) 0%, transparent 50%),
+                radial-gradient(circle at 50% 50%, rgba(148, 226, 213, 0.02) 0%, transparent 70%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* Noise texture overlay */
+        #bg-pattern::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+            opacity: 0.02;
+            pointer-events: none;
+        }
+
+        /* Main container */
+        #app {
+            position: relative;
+            z-index: 1;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        /* Clock container */
+        .clock-section {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        #time {
+            font-size: clamp(4rem, 12vw, 10rem);
+            font-weight: 300;
+            letter-spacing: -0.02em;
+            color: var(--text);
+            line-height: 1;
+            text-shadow: 0 0 80px rgba(203, 166, 247, 0.15);
+        }
+
+        #date {
+            font-size: clamp(0.75rem, 1.5vw, 1rem);
+            font-weight: 400;
+            color: var(--overlay1);
+            margin-top: 0.75rem;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+        }
+
+        /* Search bar */
+        .search-container {
+            width: 100%;
+            max-width: 580px;
+            margin-bottom: 2rem;
+        }
+
+        #search-input {
+            width: 100%;
+            padding: 1rem 1.5rem;
+            background: var(--surface0);
+            border: 1px solid var(--surface1);
+            border-radius: 12px;
+            color: var(--text);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            outline: none;
+            transition: all 0.2s ease;
+        }
+
+        #search-input::placeholder {
+            color: var(--overlay0);
+        }
+
+        #search-input:focus {
+            border-color: var(--mauve);
+            box-shadow: 0 0 0 3px rgba(203, 166, 247, 0.1);
+        }
+
+        /* Quick actions */
+        .quick-actions {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            justify-content: center;
+            max-width: 580px;
+        }
+
+        .quick-action {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.6rem 1rem;
+            background: var(--surface0);
+            border: 1px solid transparent;
+            border-radius: 8px;
+            color: var(--subtext1);
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+        }
+
+        .quick-action:hover {
+            background: var(--surface1);
+            color: var(--text);
+            border-color: var(--surface2);
+        }
+
+        .quick-action i {
+            font-size: 0.85rem;
+            opacity: 0.7;
+        }
+
+        /* Side dock */
+        #dock {
+            position: fixed;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+            padding: 0.5rem;
+            background: var(--mantle);
+            border: 1px solid var(--surface0);
+            border-radius: 14px;
+            z-index: 100;
+        }
+
+        .dock-item {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: transparent;
+            border: none;
+            border-radius: 10px;
+            color: var(--overlay1);
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        .dock-item:hover {
+            background: var(--surface0);
+            color: var(--text);
+        }
+
+        .dock-item.active {
+            background: var(--mauve);
+            color: var(--crust);
+        }
+
+        .dock-item::before {
+            content: attr(data-tooltip);
+            position: absolute;
+            right: calc(100% + 12px);
+            padding: 0.4rem 0.8rem;
+            background: var(--surface0);
+            border: 1px solid var(--surface1);
+            border-radius: 6px;
+            font-size: 0.7rem;
+            color: var(--text);
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.15s ease;
+        }
+
+        .dock-item:hover::before {
+            opacity: 1;
+        }
+
+        /* Terminal */
+        #terminal-container {
+            position: fixed;
+            bottom: 1rem;
+            left: 1rem;
+            width: 420px;
+            height: 320px;
+            background: var(--mantle);
+            border: 1px solid var(--surface0);
+            border-radius: 14px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            z-index: 50;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        #terminal-container.collapsed {
+            width: 48px;
+            height: 48px;
+        }
+
+        #terminal-container.hidden {
+            display: none;
+        }
+
+        #terminal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.75rem 1rem;
+            background: var(--crust);
+            border-bottom: 1px solid var(--surface0);
+        }
+
+        .terminal-title {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.75rem;
+            color: var(--overlay1);
+        }
+
+        .terminal-title i {
+            color: var(--mauve);
+        }
+
+        .terminal-controls {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .terminal-btn {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            transition: opacity 0.2s ease;
+        }
+
+        .terminal-btn:hover {
+            opacity: 0.8;
+        }
+
+        .terminal-btn.close { background: var(--red); }
+        .terminal-btn.minimize { background: var(--yellow); }
+        .terminal-btn.maximize { background: var(--green); }
+
+        #terminal-container.collapsed #terminal-header {
+            padding: 0;
+            justify-content: center;
+            height: 100%;
+            border: none;
+        }
+
+        #terminal-container.collapsed .terminal-title span,
+        #terminal-container.collapsed .terminal-controls {
+            display: none;
+        }
+
+        #terminal-container.collapsed .terminal-title {
+            margin: 0;
+        }
+
+        #terminal-container.collapsed .terminal-title i {
+            font-size: 1rem;
+        }
+
+        #terminal-output {
+            flex: 1;
+            padding: 1rem;
+            overflow-y: auto;
+            font-size: 0.8rem;
+            line-height: 1.6;
+            color: var(--text);
+        }
+
+        #terminal-output::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        #terminal-output::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        #terminal-output::-webkit-scrollbar-thumb {
+            background: var(--surface1);
+            border-radius: 3px;
+        }
+
+        .terminal-line {
+            margin-bottom: 0.25rem;
+        }
+
+        .terminal-prompt {
+            color: var(--mauve);
+        }
+
+        .terminal-success { color: var(--green); }
+        .terminal-error { color: var(--red); }
+        .terminal-info { color: var(--blue); }
+        .terminal-warning { color: var(--yellow); }
+
+        #terminal-input-container {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1rem;
+            background: var(--crust);
+            border-top: 1px solid var(--surface0);
+        }
+
+        #terminal-input-container .prompt {
+            color: var(--mauve);
+            font-size: 0.8rem;
+        }
+
+        #terminal-input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            outline: none;
+            color: var(--text);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+        }
+
+        #terminal-input::placeholder {
+            color: var(--surface2);
+        }
+
+        #terminal-container.collapsed #terminal-output,
+        #terminal-container.collapsed #terminal-input-container {
+            display: none;
+        }
+
+        /* Modal base */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(17, 17, 27, 0.8);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            z-index: 200;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .modal-overlay.open {
+            display: flex;
+        }
+
+        .modal-window {
+            background: var(--mantle);
+            border: 1px solid var(--surface0);
+            border-radius: 16px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 24px 64px rgba(0, 0, 0, 0.4);
+            max-height: 90vh;
+        }
+
+        .modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem 1.25rem;
+            background: var(--crust);
+            border-bottom: 1px solid var(--surface0);
+        }
+
+        .modal-title {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--text);
+        }
+
+        .modal-title i {
+            color: var(--mauve);
+        }
+
+        .modal-close {
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--surface0);
+            border: none;
+            border-radius: 6px;
+            color: var(--overlay1);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .modal-close:hover {
+            background: var(--red);
+            color: var(--crust);
+        }
+
+        .modal-content {
+            padding: 1.5rem;
+            overflow-y: auto;
+        }
+
+        /* Calculator */
+        #calculator-modal .modal-window {
+            width: 320px;
+        }
+
+        #calc-display {
+            padding: 1.5rem;
+            background: var(--crust);
+            text-align: right;
+            font-size: 2.5rem;
+            font-weight: 300;
+            color: var(--text);
+            border-bottom: 1px solid var(--surface0);
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        #calc-buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1px;
+            background: var(--surface0);
+        }
+
+        .calc-btn {
+            padding: 1.25rem;
+            background: var(--mantle);
+            border: none;
+            color: var(--text);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: background 0.15s ease;
+        }
+
+        .calc-btn:hover {
+            background: var(--surface0);
+        }
+
+        .calc-btn.operator {
+            background: var(--surface0);
+            color: var(--mauve);
+        }
+
+        .calc-btn.operator:hover {
+            background: var(--surface1);
+        }
+
+        .calc-btn.equals {
+            background: var(--mauve);
+            color: var(--crust);
+        }
+
+        .calc-btn.equals:hover {
+            background: var(--lavender);
+        }
+
+        .calc-btn.clear {
+            color: var(--red);
+        }
+
+        /* Converter */
+        #converter-modal .modal-window {
+            width: 400px;
+        }
+
+        .converter-group {
+            margin-bottom: 1rem;
+        }
+
+        .converter-label {
+            display: block;
+            font-size: 0.7rem;
+            color: var(--overlay1);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 0.5rem;
+        }
+
+        .converter-input, .converter-select {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            background: var(--surface0);
+            border: 1px solid var(--surface1);
+            border-radius: 8px;
+            color: var(--text);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            outline: none;
+            transition: border-color 0.2s ease;
+        }
+
+        .converter-input:focus, .converter-select:focus {
+            border-color: var(--mauve);
+        }
+
+        .converter-row {
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        .converter-row .converter-input { flex: 2; }
+        .converter-row .converter-select { flex: 1; }
+
+        #converter-result {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: var(--surface0);
+            border-radius: 8px;
+            text-align: center;
+            font-size: 1.5rem;
+            font-weight: 500;
+            color: var(--green);
+        }
+
+        /* Notes */
+        #notes-modal .modal-window {
+            width: 500px;
+            max-height: 70vh;
+        }
+
+        #notes-list {
+            max-height: 300px;
+            overflow-y: auto;
+            margin-bottom: 1rem;
+        }
+
+        .note-item {
+            padding: 1rem;
+            background: var(--surface0);
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+        }
+
+        .note-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .note-time {
+            font-size: 0.65rem;
+            color: var(--overlay0);
+        }
+
+        .note-delete {
+            padding: 0.25rem 0.5rem;
+            background: transparent;
+            border: 1px solid var(--red);
+            border-radius: 4px;
+            color: var(--red);
+            font-size: 0.65rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .note-delete:hover {
+            background: var(--red);
+            color: var(--crust);
+        }
+
+        .note-text {
+            font-size: 0.85rem;
+            line-height: 1.5;
+            color: var(--subtext1);
+            white-space: pre-wrap;
+        }
+
+        #note-input {
+            width: 100%;
+            min-height: 80px;
+            padding: 0.75rem;
+            background: var(--surface0);
+            border: 1px solid var(--surface1);
+            border-radius: 8px;
+            color: var(--text);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            resize: vertical;
+            outline: none;
+        }
+
+        #note-input:focus {
+            border-color: var(--mauve);
+        }
+
+        #add-note-btn {
+            margin-top: 0.75rem;
+            padding: 0.75rem 1.5rem;
+            background: var(--mauve);
+            border: none;
+            border-radius: 8px;
+            color: var(--crust);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+
+        #add-note-btn:hover {
+            background: var(--lavender);
+        }
+
+        /* Timer */
+        #timer-modal .modal-window {
+            width: 400px;
+        }
+
+        #timer-display {
+            text-align: center;
+            font-size: 4rem;
+            font-weight: 300;
+            color: var(--mauve);
+            margin-bottom: 1.5rem;
+        }
+
+        .timer-controls {
+            display: flex;
+            gap: 0.5rem;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .timer-btn {
+            padding: 0.75rem 1.5rem;
+            background: var(--surface0);
+            border: 1px solid var(--surface1);
+            border-radius: 8px;
+            color: var(--text);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .timer-btn:hover {
+            background: var(--surface1);
+            border-color: var(--mauve);
+        }
+
+        .timer-btn.primary {
+            background: var(--mauve);
+            border-color: var(--mauve);
+            color: var(--crust);
+        }
+
+        .timer-btn.primary:hover {
+            background: var(--lavender);
+            border-color: var(--lavender);
+        }
+
+        .timer-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .timer-presets {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.5rem;
+        }
+
+        .timer-preset {
+            padding: 0.75rem;
+            background: var(--surface0);
+            border: 1px solid var(--surface1);
+            border-radius: 8px;
+            color: var(--subtext1);
+            font-size: 0.8rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .timer-preset:hover {
+            background: var(--surface1);
+            border-color: var(--mauve);
+            color: var(--text);
+        }
+
+        /* QR Code */
+        #qr-modal .modal-window {
+            width: 380px;
+        }
+
+        #qr-input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            background: var(--surface0);
+            border: 1px solid var(--surface1);
+            border-radius: 8px;
+            color: var(--text);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            outline: none;
+            margin-bottom: 1rem;
+        }
+
+        #qr-input:focus {
+            border-color: var(--mauve);
+        }
+
+        #qr-display {
+            display: flex;
+            justify-content: center;
+            padding: 1.5rem;
+            background: #fff;
+            border-radius: 12px;
+            margin-bottom: 1rem;
+        }
+
+        #qr-download {
+            width: 100%;
+            padding: 0.75rem;
+            background: var(--green);
+            border: none;
+            border-radius: 8px;
+            color: var(--crust);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: opacity 0.2s ease;
+        }
+
+        #qr-download:hover {
+            opacity: 0.9;
+        }
+
+        /* Color Picker */
+        #color-modal .modal-window {
+            width: 420px;
+        }
+
+        #color-picker {
+            width: 100%;
+            height: 50px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-bottom: 1rem;
+        }
+
+        .color-values {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .color-value {
+            padding: 0.75rem;
+            background: var(--surface0);
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .color-value-label {
+            font-size: 0.6rem;
+            color: var(--overlay0);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 0.25rem;
+        }
+
+        .color-value-text {
+            font-size: 0.8rem;
+            color: var(--text);
+            cursor: pointer;
+        }
+
+        .color-value-text:hover {
+            color: var(--mauve);
+        }
+
+        .saved-colors-title {
+            font-size: 0.7rem;
+            color: var(--overlay1);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 0.75rem;
+        }
+
+        .saved-colors {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            gap: 0.5rem;
+        }
+
+        .saved-color {
+            aspect-ratio: 1;
+            border-radius: 6px;
+            border: 2px solid var(--surface1);
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        .saved-color:hover {
+            transform: scale(1.1);
+        }
+
+        .saved-color.empty {
+            background: var(--surface0);
+            border-style: dashed;
+        }
+
+        /* Breathing */
+        #breathing-modal .modal-window {
+            width: 450px;
+        }
+
+        .breathing-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 2rem 1rem;
+        }
+
+        #breathing-select {
+            margin-bottom: 2rem;
+            padding: 0.75rem 1rem;
+            background: var(--surface0);
+            border: 1px solid var(--surface1);
+            border-radius: 8px;
+            color: var(--text);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            outline: none;
+        }
+
+        #breathing-circle {
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--mauve), var(--blue));
+            margin-bottom: 2rem;
+            transition: transform 4s ease-in-out;
+            box-shadow: 0 0 60px rgba(203, 166, 247, 0.2);
+        }
+
+        #breathing-circle.inhale { transform: scale(1.3); }
+        #breathing-circle.hold { transform: scale(1.3); }
+        #breathing-circle.exhale { transform: scale(1); }
+
+        #breathing-instruction {
+            font-size: 1.5rem;
+            font-weight: 500;
+            color: var(--text);
+            margin-bottom: 0.5rem;
+        }
+
+        #breathing-timer {
+            font-size: 3rem;
+            font-weight: 300;
+            color: var(--mauve);
+            margin-bottom: 2rem;
+        }
+
+        .breathing-controls {
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        /* Settings sidebar */
+        #settings-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(17, 17, 27, 0.6);
+            z-index: 150;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        #settings-overlay.open {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        #settings-panel {
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 320px;
+            height: 100vh;
+            background: var(--mantle);
+            border-left: 1px solid var(--surface0);
+            z-index: 160;
+            transform: translateX(100%);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow-y: auto;
+        }
+
+        #settings-panel.open {
+            transform: translateX(0);
+        }
+
+        .settings-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--surface0);
+        }
+
+        .settings-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .settings-section {
+            padding: 1.25rem 1.5rem;
+            border-bottom: 1px solid var(--surface0);
+        }
+
+        .settings-section-title {
+            font-size: 0.65rem;
+            color: var(--overlay0);
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            margin-bottom: 1rem;
+        }
+
+        .settings-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 0.75rem;
+        }
+
+        .settings-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .settings-label {
+            font-size: 0.85rem;
+            color: var(--subtext1);
+        }
+
+        .toggle {
+            position: relative;
+            width: 44px;
+            height: 24px;
+            background: var(--surface1);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+
+        .toggle.active {
+            background: var(--mauve);
+        }
+
+        .toggle::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 20px;
+            height: 20px;
+            background: var(--text);
+            border-radius: 50%;
+            transition: transform 0.2s ease;
+        }
+
+        .toggle.active::after {
+            transform: translateX(20px);
+            background: var(--crust);
+        }
+
+        .settings-select {
+            padding: 0.5rem 0.75rem;
+            background: var(--surface0);
+            border: 1px solid var(--surface1);
+            border-radius: 6px;
+            color: var(--text);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            outline: none;
+        }
+
+        .settings-footer {
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        .settings-footer p {
+            font-size: 0.7rem;
+            color: var(--overlay0);
+            line-height: 1.6;
+        }
+
+        .settings-footer a {
+            color: var(--mauve);
+            text-decoration: none;
+        }
+
+        .settings-footer a:hover {
+            text-decoration: underline;
+        }
+
+        /* Clicker game */
+        #game-modal .modal-window {
+            width: 400px;
+        }
+
+        .game-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 2rem 1rem;
+        }
+
+        .game-score-label {
+            font-size: 0.7rem;
+            color: var(--overlay1);
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            margin-bottom: 0.5rem;
+        }
+
+        #game-score {
+            font-size: 4rem;
+            font-weight: 300;
+            color: var(--mauve);
+            margin-bottom: 2rem;
+        }
+
+        #game-click-btn {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--mauve), var(--pink));
+            border: none;
+            color: var(--crust);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.1s ease, box-shadow 0.2s ease;
+            box-shadow: 0 8px 32px rgba(203, 166, 247, 0.3);
+        }
+
+        #game-click-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 12px 40px rgba(203, 166, 247, 0.4);
+        }
+
+        #game-click-btn:active {
+            transform: scale(0.95);
+        }
+
+        .game-hint {
+            margin-top: 1.5rem;
+            font-size: 0.75rem;
+            color: var(--overlay0);
+        }
+
+        #game-reset {
+            margin-top: 1rem;
+            padding: 0.5rem 1rem;
+            background: transparent;
+            border: 1px solid var(--red);
+            border-radius: 6px;
+            color: var(--red);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        #game-reset:hover {
+            background: var(--red);
+            color: var(--crust);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            #dock {
+                right: 0.5rem;
+                padding: 0.25rem;
+            }
+
+            .dock-item {
+                width: 36px;
+                height: 36px;
+                font-size: 0.85rem;
+            }
+
+            .dock-item::before {
+                display: none;
+            }
+
+            #terminal-container {
+                width: calc(100% - 4rem);
+                left: 0.5rem;
+                bottom: 0.5rem;
+                height: 280px;
+            }
+
+            #time {
+                font-size: clamp(3rem, 15vw, 5rem);
+            }
+
+            .search-container {
+                padding: 0 1rem;
+            }
+
+            .modal-window {
+                margin: 1rem;
+                max-width: calc(100vw - 2rem);
+            }
+        }
+    </style>
+</head>
+<body class="dark">
+    <div id="bg-pattern"></div>
+
+    <div id="app">
+        <div class="clock-section">
+            <div id="time">00:00</div>
+            <div id="date">Loading...</div>
+        </div>
+
+        <div class="search-container">
+            <input type="text" id="search-input" placeholder="Search or enter URL..." autocomplete="off">
+        </div>
+
+        <div class="quick-actions">
+            <a href="https://github.com" class="quick-action" target="_blank">
+                <i class="fab fa-github"></i>
+                <span>GitHub</span>
+            </a>
+            <a href="https://poe.com" class="quick-action" target="_blank">
+                <i class="fas fa-robot"></i>
+                <span>Poe</span>
+            </a>
+            <a href="https://youtube.com" class="quick-action" target="_blank">
+                <i class="fab fa-youtube"></i>
+                <span>YouTube</span>
+            </a>
+            <a href="https://reddit.com" class="quick-action" target="_blank">
+                <i class="fab fa-reddit"></i>
+                <span>Reddit</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- Dock -->
+    <div id="dock">
+        <button class="dock-item" id="toggle-settings" data-tooltip="Settings">
+            <i class="fas fa-cog"></i>
+        </button>
+        <button class="dock-item" id="toggle-terminal" data-tooltip="Terminal">
+            <i class="fas fa-terminal"></i>
+        </button>
+        <button class="dock-item" id="toggle-calc" data-tooltip="Calculator">
+            <i class="fas fa-calculator"></i>
+        </button>
+        <button class="dock-item" id="toggle-converter" data-tooltip="Converter">
+            <i class="fas fa-exchange-alt"></i>
+        </button>
+        <button class="dock-item" id="toggle-notes" data-tooltip="Notes">
+            <i class="fas fa-sticky-note"></i>
+        </button>
+        <button class="dock-item" id="toggle-timer" data-tooltip="Timer">
+            <i class="fas fa-clock"></i>
+        </button>
+        <button class="dock-item" id="toggle-qr" data-tooltip="QR Code">
+            <i class="fas fa-qrcode"></i>
+        </button>
+        <button class="dock-item" id="toggle-color" data-tooltip="Color Picker">
+            <i class="fas fa-palette"></i>
+        </button>
+        <button class="dock-item" id="toggle-breathing" data-tooltip="Breathing">
+            <i class="fas fa-wind"></i>
+        </button>
+        <button class="dock-item" id="toggle-game" data-tooltip="Clicker">
+            <i class="fas fa-gamepad"></i>
+        </button>
+    </div>
+
+    <!-- Terminal -->
+    <div id="terminal-container">
+        <div id="terminal-header">
+            <div class="terminal-title">
+                <i class="fas fa-terminal"></i>
+                <span>terminal</span>
+            </div>
+            <div class="terminal-controls">
+                <button class="terminal-btn close" id="term-close"></button>
+                <button class="terminal-btn minimize" id="term-minimize"></button>
+                <button class="terminal-btn maximize" id="term-maximize"></button>
+            </div>
+        </div>
+        <div id="terminal-output"></div>
+        <div id="terminal-input-container">
+            <span class="prompt">❯</span>
+            <input type="text" id="terminal-input" placeholder="type help..." autocomplete="off">
+        </div>
+    </div>
+
+    <!-- Settings Panel -->
+    <div id="settings-overlay"></div>
+    <div id="settings-panel">
+        <div class="settings-header">
+            <div class="settings-title">Settings</div>
+        </div>
+
+        <div class="settings-section">
+            <div class="settings-section-title">Appearance</div>
+            <div class="settings-row">
+                <span class="settings-label">Dark Mode</span>
+                <div class="toggle active" id="theme-toggle"></div>
+            </div>
+        </div>
+
+        <div class="settings-section">
+            <div class="settings-section-title">Components</div>
+            <div class="settings-row">
+                <span class="settings-label">Show Terminal</span>
+                <div class="toggle active" id="terminal-toggle"></div>
+            </div>
+        </div>
+
+        <div class="settings-section">
+            <div class="settings-section-title">Clock</div>
+            <div class="settings-row">
+                <span class="settings-label">24-Hour Format</span>
+                <div class="toggle active" id="clock-format-toggle"></div>
+            </div>
+            <div class="settings-row">
+                <span class="settings-label">Show Seconds</span>
+                <div class="toggle active" id="clock-seconds-toggle"></div>
+            </div>
+        </div>
+
+        <div class="settings-footer">
+            <p>
+                Minimalist New Tab<br>
+                Inspired by Arch Linux aesthetics<br>
+                <a href="https://github.com/7aimez">@7aimez</a>
+            </p>
+        </div>
+    </div>
+
+    <!-- Calculator Modal -->
+    <div class="modal-overlay" id="calculator-modal">
+        <div class="modal-window">
+            <div class="modal-header">
+                <div class="modal-title">
+                    <i class="fas fa-calculator"></i>
+                    <span>Calculator</span>
+                </div>
+                <button class="modal-close" data-close="calculator-modal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div id="calc-display">0</div>
+            <div id="calc-buttons">
+                <button class="calc-btn clear">C</button>
+                <button class="calc-btn operator">÷</button>
+                <button class="calc-btn operator">×</button>
+                <button class="calc-btn operator">←</button>
+                <button class="calc-btn">7</button>
+                <button class="calc-btn">8</button>
+                <button class="calc-btn">9</button>
+                <button class="calc-btn operator">−</button>
+                <button class="calc-btn">4</button>
+                <button class="calc-btn">5</button>
+                <button class="calc-btn">6</button>
+                <button class="calc-btn operator">+</button>
+                <button class="calc-btn">1</button>
+                <button class="calc-btn">2</button>
+                <button class="calc-btn">3</button>
+                <button class="calc-btn equals" style="grid-row: span 2;">=</button>
+                <button class="calc-btn" style="grid-column: span 2;">0</button>
+                <button class="calc-btn">.</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Converter Modal -->
+    <div class="modal-overlay" id="converter-modal">
+        <div class="modal-window">
+            <div class="modal-header">
+                <div class="modal-title">
+                    <i class="fas fa-exchange-alt"></i>
+                    <span>Unit Converter</span>
+                </div>
+                <button class="modal-close" data-close="converter-modal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-content">
+                <div class="converter-group">
+                    <label class="converter-label">Type</label>
+                    <select id="conversion-type" class="converter-select">
+                        <option value="length">Length</option>
+                        <option value="weight">Weight</option>
+                        <option value="temperature">Temperature</option>
+                        <option value="volume">Volume</option>
+                    </select>
+                </div>
+                <div class="converter-group">
+                    <label class="converter-label">From</label>
+                    <div class="converter-row">
+                        <input type="number" id="from-value" class="converter-input" value="1">
+                        <select id="from-unit" class="converter-select"></select>
+                    </div>
+                </div>
+                <div class="converter-group">
+                    <label class="converter-label">To</label>
+                    <select id="to-unit" class="converter-select"></select>
+                </div>
+                <div id="converter-result">0</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notes Modal -->
+    <div class="modal-overlay" id="notes-modal">
+        <div class="modal-window">
+            <div class="modal-header">
+                <div class="modal-title">
+                    <i class="fas fa-sticky-note"></i>
+                    <span>Notes</span>
+                </div>
+                <button class="modal-close" data-close="notes-modal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-content">
+                <div id="notes-list"></div>
+                <textarea id="note-input" placeholder="Write a note..."></textarea>
+                <button id="add-note-btn">Add Note</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Timer Modal -->
+    <div class="modal-overlay" id="timer-modal">
+        <div class="modal-window">
+            <div class="modal-header">
+                <div class="modal-title">
+                    <i class="fas fa-clock"></i>
+                    <span>Timer</span>
+                </div>
+                <button class="modal-close" data-close="timer-modal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-content">
+                <div id="timer-display">05:00</div>
+                <div class="timer-controls">
+                    <button class="timer-btn primary" id="timer-start">Start</button>
+                    <button class="timer-btn" id="timer-pause" disabled>Pause</button>
+                    <button class="timer-btn" id="timer-reset">Reset</button>
+                </div>
+                <div class="timer-presets">
+                    <div class="timer-preset" data-seconds="300">5 min</div>
+                    <div class="timer-preset" data-seconds="600">10 min</div>
+                    <div class="timer-preset" data-seconds="900">15 min</div>
+                    <div class="timer-preset" data-seconds="1500">25 min</div>
+                    <div class="timer-preset" data-seconds="1800">30 min</div>
+                    <div class="timer-preset" data-seconds="3600">60 min</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- QR Modal -->
+    <div class="modal-overlay" id="qr-modal">
+        <div class="modal-window">
+            <div class="modal-header">
+                <div class="modal-title">
+                    <i class="fas fa-qrcode"></i>
+                    <span>QR Code</span>
+                </div>
+                <button class="modal-close" data-close="qr-modal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-content">
+                <input type="text" id="qr-input" placeholder="Enter text or URL...">
+                <div id="qr-display"></div>
+                <button id="qr-download">Download PNG</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Color Picker Modal -->
+    <div class="modal-overlay" id="color-modal">
+        <div class="modal-window">
+            <div class="modal-header">
+                <div class="modal-title">
+                    <i class="fas fa-palette"></i>
+                    <span>Color Picker</span>
+                </div>
+                <button class="modal-close" data-close="color-modal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-content">
+                <input type="color" id="color-picker" value="#cba6f7">
+                <div class="color-values">
+                    <div class="color-value">
+                        <div class="color-value-label">HEX</div>
+                        <div class="color-value-text" id="color-hex">#cba6f7</div>
+                    </div>
+                    <div class="color-value">
+                        <div class="color-value-label">RGB</div>
+                        <div class="color-value-text" id="color-rgb">rgb(203, 166, 247)</div>
+                    </div>
+                    <div class="color-value">
+                        <div class="color-value-label">HSL</div>
+                        <div class="color-value-text" id="color-hsl">hsl(267, 84%, 81%)</div>
+                    </div>
+                </div>
+                <div class="saved-colors-title">Saved Colors</div>
+                <div class="saved-colors" id="saved-colors"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Breathing Modal -->
+    <div class="modal-overlay" id="breathing-modal">
+        <div class="modal-window">
+            <div class="modal-header">
+                <div class="modal-title">
+                    <i class="fas fa-wind"></i>
+                    <span>Breathing Exercise</span>
+                </div>
+                <button class="modal-close" data-close="breathing-modal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-content">
+                <div class="breathing-content">
+                    <select id="breathing-select">
+                        <option value="478">4-7-8 Breathing</option>
+                        <option value="box">Box Breathing</option>
+                        <option value="calm">Calm Breathing</option>
+                    </select>
+                    <div id="breathing-circle"></div>
+                    <div id="breathing-instruction">Press Start</div>
+                    <div id="breathing-timer">0</div>
+                    <div class="breathing-controls">
+                        <button class="timer-btn primary" id="breathing-start">Start</button>
+                        <button class="timer-btn" id="breathing-stop">Stop</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Game Modal -->
+    <div class="modal-overlay" id="game-modal">
+        <div class="modal-window">
+            <div class="modal-header">
+                <div class="modal-title">
+                    <i class="fas fa-gamepad"></i>
+                    <span>Clicker</span>
+                </div>
+                <button class="modal-close" data-close="game-modal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-content">
+                <div class="game-content">
+                    <div class="game-score-label">Score</div>
+                    <div id="game-score">0</div>
+                    <button id="game-click-btn">CLICK</button>
+                    <div class="game-hint">Press SPACE or click</div>
+                    <button id="game-reset">Reset</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Storage helper with fallback for iframe environments
+        const storage = (() => {
+            const memoryStorage = {};
+            try {
+                const testKey = '__test__';
+                window.localStorage.setItem(testKey, testKey);
+                window.localStorage.removeItem(testKey);
+                return window.localStorage;
+            } catch (e) {
+                return {
+                    getItem: (key) => memoryStorage[key] || null,
+                    setItem: (key, value) => { memoryStorage[key] = String(value); },
+                    removeItem: (key) => { delete memoryStorage[key]; }
+                };
+            }
+        })();
+
+        // Elements
+        const timeEl = document.getElementById('time');
+        const dateEl = document.getElementById('date');
+        const searchInput = document.getElementById('search-input');
+        const terminalContainer = document.getElementById('terminal-container');
+        const terminalOutput = document.getElementById('terminal-output');
+        const terminalInput = document.getElementById('terminal-input');
+        const settingsOverlay = document.getElementById('settings-overlay');
+        const settingsPanel = document.getElementById('settings-panel');
+
+        // State
+        let clockFormat24 = storage.getItem('clock-24h') !== 'false';
+        let showSeconds = storage.getItem('clock-seconds') !== 'false';
+        let quickLinks = JSON.parse(storage.getItem('quick-links') || '{}');
+
+        // ===== CLOCK =====
+        function updateClock() {
+            const now = new Date();
+            const options = {
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: !clockFormat24
+            };
+            if (showSeconds) options.second = '2-digit';
+
+            timeEl.textContent = now.toLocaleTimeString('en-US', options);
+            dateEl.textContent = now.toLocaleDateString('en-US', {
+                weekday: 'long',
+                month: 'short',
+                day: 'numeric'
+            });
+        }
+
+        setInterval(updateClock, 1000);
+        updateClock();
+
+        // ===== SEARCH =====
+        searchInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                const query = searchInput.value.trim();
+                if (!query) return;
+
+                if (query.includes('.') && !query.includes(' ')) {
+                    let url = query;
+                    if (!url.startsWith('http')) url = 'https://' + url;
+                    window.open(url, '_blank');
+                } else {
+                    window.open('https://www.google.com/search?q=' + encodeURIComponent(query), '_blank');
+                }
+                searchInput.value = '';
+            }
+        });
+
+        // ===== SETTINGS =====
+        document.getElementById('toggle-settings').addEventListener('click', () => {
+            settingsOverlay.classList.add('open');
+            settingsPanel.classList.add('open');
+        });
+
+        settingsOverlay.addEventListener('click', () => {
+            settingsOverlay.classList.remove('open');
+            settingsPanel.classList.remove('open');
+        });
+
+        // Theme toggle
+        const themeToggle = document.getElementById('theme-toggle');
+        function applyTheme() {
+            const isDark = storage.getItem('theme') !== 'light';
+            document.body.classList.toggle('light', !isDark);
+            document.body.classList.toggle('dark', isDark);
+            themeToggle.classList.toggle('active', isDark);
+        }
+        applyTheme();
+
+        themeToggle.addEventListener('click', () => {
+            const isDark = document.body.classList.contains('dark');
+            storage.setItem('theme', isDark ? 'light' : 'dark');
+            applyTheme();
+        });
+
+        // Terminal toggle
+        const terminalToggle = document.getElementById('terminal-toggle');
+        function applyTerminalVisibility() {
+            const visible = storage.getItem('terminal-visible') !== 'false';
+            terminalContainer.classList.toggle('hidden', !visible);
+            terminalToggle.classList.toggle('active', visible);
+        }
+        applyTerminalVisibility();
+
+        terminalToggle.addEventListener('click', () => {
+            const visible = !terminalContainer.classList.contains('hidden');
+            storage.setItem('terminal-visible', !visible);
+            applyTerminalVisibility();
+        });
+
+        // Clock format
+        const clockFormatToggle = document.getElementById('clock-format-toggle');
+        clockFormatToggle.classList.toggle('active', clockFormat24);
+        clockFormatToggle.addEventListener('click', () => {
+            clockFormat24 = !clockFormat24;
+            storage.setItem('clock-24h', clockFormat24);
+            clockFormatToggle.classList.toggle('active', clockFormat24);
+            updateClock();
+        });
+
+        // Clock seconds
+        const clockSecondsToggle = document.getElementById('clock-seconds-toggle');
+        clockSecondsToggle.classList.toggle('active', showSeconds);
+        clockSecondsToggle.addEventListener('click', () => {
+            showSeconds = !showSeconds;
+            storage.setItem('clock-seconds', showSeconds);
+            clockSecondsToggle.classList.toggle('active', showSeconds);
+            updateClock();
+        });
+
+        // ===== TERMINAL =====
+        document.getElementById('toggle-terminal').addEventListener('click', () => {
+            const visible = terminalContainer.classList.contains('hidden');
+            terminalContainer.classList.toggle('hidden', !visible);
+            storage.setItem('terminal-visible', visible);
+            terminalToggle.classList.toggle('active', visible);
+        });
+
+        document.getElementById('term-close').addEventListener('click', () => {
+            terminalContainer.classList.add('hidden');
+            storage.setItem('terminal-visible', false);
+            terminalToggle.classList.remove('active');
+        });
+
+        document.getElementById('term-minimize').addEventListener('click', () => {
+            terminalContainer.classList.toggle('collapsed');
+        });
+
+        document.getElementById('term-maximize').addEventListener('click', () => {
+            terminalContainer.classList.remove('collapsed');
+        });
+
+        const commands = {
+            help: {
+                desc: 'Show commands',
+                fn: () => {
+                    let out = '<div class="terminal-info" style="margin-bottom:4px">Commands:</div>';
+                    for (const [cmd, data] of Object.entries(commands)) {
+                        out += `<div style="margin-left:12px"><span class="terminal-success">${cmd}</span> — ${data.desc}</div>`;
+                    }
+                    return out;
+                }
+            },
+            clear: {
+                desc: 'Clear terminal',
+                fn: () => { terminalOutput.innerHTML = ''; return null; }
+            },
+            time: {
+                desc: 'Show current time',
+                fn: () => `<span class="terminal-success">${new Date().toLocaleTimeString()}</span>`
+            },
+            date: {
+                desc: 'Show current date',
+                fn: () => `<span class="terminal-success">${new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</span>`
+            },
+            theme: {
+                desc: 'Toggle theme',
+                fn: () => {
+                    const isDark = document.body.classList.contains('dark');
+                    storage.setItem('theme', isDark ? 'light' : 'dark');
+                    applyTheme();
+                    return `<span class="terminal-success">Theme: ${isDark ? 'light' : 'dark'}</span>`;
+                }
+            },
+            open: {
+                desc: 'Open URL (open <url>)',
+                fn: (param) => {
+                    if (!param) return '<span class="terminal-error">Usage: open <url></span>';
+                    let url = param;
+                    if (!url.startsWith('http')) url = 'https://' + url;
+                    window.open(url, '_blank');
+                    return `<span class="terminal-success">Opening ${url}</span>`;
+                }
+            },
+            search: {
+                desc: 'Google search (search <query>)',
+                fn: (param) => {
+                    if (!param) return '<span class="terminal-error">Usage: search <query></span>';
+                    window.open('https://www.google.com/search?q=' + encodeURIComponent(param), '_blank');
+                    return `<span class="terminal-success">Searching: ${param}</span>`;
+                }
+            },
+            gh: {
+                desc: 'Open GitHub (gh <user/repo>)',
+                fn: (param) => {
+                    const url = param ? `https://github.com/${param}` : 'https://github.com';
+                    window.open(url, '_blank');
+                    return `<span class="terminal-success">Opening ${url}</span>`;
+                }
+            },
+            qladd: {
+                desc: 'Add quick link (qladd <key> <url>)',
+                fn: (param) => {
+                    if (!param) return '<span class="terminal-error">Usage: qladd <key> <url></span>';
+                    const [key, ...rest] = param.split(' ');
+                    const url = rest.join(' ');
+                    if (!url) return '<span class="terminal-error">Usage: qladd <key> <url></span>';
+                    quickLinks[key] = url;
+                    storage.setItem('quick-links', JSON.stringify(quickLinks));
+                    return `<span class="terminal-success">Added: ${key} → ${url}</span>`;
+                }
+            },
+            qlview: {
+                desc: 'View quick links',
+                fn: () => {
+                    const entries = Object.entries(quickLinks);
+                    if (entries.length === 0) return '<span class="terminal-info">No quick links. Use qladd to add.</span>';
+                    let out = '<div class="terminal-info" style="margin-bottom:4px">Quick Links:</div>';
+                    entries.forEach(([k, v]) => {
+                        out += `<div style="margin-left:12px"><span class="terminal-success">${k}</span> → ${v}</div>`;
+                    });
+                    return out;
+                }
+            },
+            qlremove: {
+                desc: 'Remove quick link (qlremove <key>)',
+                fn: (param) => {
+                    if (!param) return '<span class="terminal-error">Usage: qlremove <key></span>';
+                    if (quickLinks[param]) {
+                        delete quickLinks[param];
+                        storage.setItem('quick-links', JSON.stringify(quickLinks));
+                        return `<span class="terminal-success">Removed: ${param}</span>`;
+                    }
+                    return `<span class="terminal-error">Not found: ${param}</span>`;
+                }
+            },
+            neofetch: {
+                desc: 'System info',
+                fn: () => {
+                    const info = [
+                        '<span class="terminal-info">        ▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄</span>',
+                        '<span class="terminal-info">       ██████████████████████</span>',
+                        '<span class="terminal-info">      ████████████████████████</span>',
+                        '<span class="terminal-info">     ██████████████████████████</span>',
+                        '',
+                        `<span class="terminal-success">user</span>@<span class="terminal-success">browser</span>`,
+                        '──────────────────',
+                        `<span class="terminal-info">OS:</span> Browser ${navigator.platform}`,
+                        `<span class="terminal-info">Host:</span> ${location.hostname || 'localhost'}`,
+                        `<span class="terminal-info">Resolution:</span> ${window.innerWidth}x${window.innerHeight}`,
+                        `<span class="terminal-info">Theme:</span> ${document.body.classList.contains('dark') ? 'Catppuccin Mocha' : 'Catppuccin Latte'}`,
+                        `<span class="terminal-info">Shell:</span> Minimal Tab v2.0`,
+                        `<span class="terminal-info">Uptime:</span> ${Math.floor(performance.now() / 1000)}s`,
+                    ];
+                    return info.join('<br>');
+                }
+            }
+        };
+
+        function addTerminalLine(content, isPrompt = true) {
+            if (content === null) return;
+            const line = document.createElement('div');
+            line.className = 'terminal-line';
+            line.innerHTML = isPrompt ? `<span class="terminal-prompt">❯</span> ${content}` : content;
+            terminalOutput.appendChild(line);
+            terminalOutput.scrollTop = terminalOutput.scrollHeight;
+        }
+
+        function executeCommand(input) {
+            const trimmed = input.trim();
+            if (!trimmed) return;
+
+            addTerminalLine(trimmed);
+
+            // Check quick links
+            if (quickLinks[trimmed]) {
+                let url = quickLinks[trimmed];
+                if (!url.startsWith('http')) url = 'https://' + url;
+                window.open(url, '_blank');
+                addTerminalLine(`<span class="terminal-success">Opening quick link: ${trimmed}</span>`, false);
+                return;
+            }
+
+            const spaceIdx = trimmed.indexOf(' ');
+            const cmd = spaceIdx === -1 ? trimmed : trimmed.slice(0, spaceIdx);
+            const param = spaceIdx === -1 ? '' : trimmed.slice(spaceIdx + 1).trim();
+
+            if (commands[cmd]) {
+                const result = commands[cmd].fn(param);
+                if (result !== null) addTerminalLine(result, false);
+            } else {
+                addTerminalLine(`<span class="terminal-error">Unknown command: ${cmd}</span>`, false);
+            }
+        }
+
+        terminalInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                executeCommand(terminalInput.value);
+                terminalInput.value = '';
+            }
+        });
+
+        addTerminalLine('<span class="terminal-info">Welcome! Type <span class="terminal-success">help</span> for commands.</span>', false);
+
+        // ===== MODALS =====
+        function openModal(id) {
+            document.getElementById(id).classList.add('open');
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.remove('open');
+        }
+
+        // Modal triggers
+        document.getElementById('toggle-calc').addEventListener('click', () => openModal('calculator-modal'));
+        document.getElementById('toggle-converter').addEventListener('click', () => { openModal('converter-modal'); updateConverterUnits(); });
+        document.getElementById('toggle-notes').addEventListener('click', () => { openModal('notes-modal'); loadNotes(); });
+        document.getElementById('toggle-timer').addEventListener('click', () => openModal('timer-modal'));
+        document.getElementById('toggle-qr').addEventListener('click', () => openModal('qr-modal'));
+        document.getElementById('toggle-color').addEventListener('click', () => { openModal('color-modal'); loadSavedColors(); });
+        document.getElementById('toggle-breathing').addEventListener('click', () => openModal('breathing-modal'));
+        document.getElementById('toggle-game').addEventListener('click', () => openModal('game-modal'));
+
+        // Close buttons
+        document.querySelectorAll('.modal-close').forEach(btn => {
+            btn.addEventListener('click', () => closeModal(btn.dataset.close));
+        });
+
+        // Click outside to close
+        document.querySelectorAll('.modal-overlay').forEach(overlay => {
+            overlay.addEventListener('click', (e) => {
+                if (e.target === overlay) overlay.classList.remove('open');
+            });
+        });
+
+        // ===== CALCULATOR =====
+        let calcValue = '0';
+        let calcPrev = null;
+        let calcOp = null;
+        const calcDisplay = document.getElementById('calc-display');
+
+        document.getElementById('calc-buttons').addEventListener('click', (e) => {
+            const btn = e.target.closest('.calc-btn');
+            if (!btn) return;
+            const val = btn.textContent;
+
+            if (val >= '0' && val <= '9') {
+                calcValue = calcValue === '0' ? val : calcValue + val;
+            } else if (val === '.') {
+                if (!calcValue.includes('.')) calcValue += '.';
+            } else if (val === 'C') {
+                calcValue = '0';
+                calcPrev = null;
+                calcOp = null;
+            } else if (val === '←') {
+                calcValue = calcValue.length > 1 ? calcValue.slice(0, -1) : '0';
+            } else if (['+', '−', '×', '÷'].includes(val)) {
+                if (calcPrev !== null && calcOp) calculateResult();
+                calcPrev = parseFloat(calcValue);
+                calcOp = val;
+                calcValue = '0';
+            } else if (val === '=') {
+                calculateResult();
+            }
+            calcDisplay.textContent = calcValue;
+        });
+
+        function calculateResult() {
+            if (calcPrev === null || !calcOp) return;
+            const curr = parseFloat(calcValue);
+            let result;
+            switch (calcOp) {
+                case '+': result = calcPrev + curr; break;
+                case '−': result = calcPrev - curr; break;
+                case '×': result = calcPrev * curr; break;
+                case '÷': result = calcPrev / curr; break;
+            }
+            calcValue = result.toString();
+            calcPrev = null;
+            calcOp = null;
+        }
+
+        // ===== CONVERTER =====
+        const conversions = {
+            length: { meters: 1, kilometers: 0.001, centimeters: 100, millimeters: 1000, miles: 0.000621371, yards: 1.09361, feet: 3.28084, inches: 39.3701 },
+            weight: { kilograms: 1, grams: 1000, milligrams: 1000000, pounds: 2.20462, ounces: 35.274 },
+            temperature: {
+                celsius: { to: (c, u) => u === 'fahrenheit' ? (c * 9/5) + 32 : u === 'kelvin' ? c + 273.15 : c },
+                fahrenheit: { to: (f, u) => u === 'celsius' ? (f - 32) * 5/9 : u === 'kelvin' ? (f - 32) * 5/9 + 273.15 : f },
+                kelvin: { to: (k, u) => u === 'celsius' ? k - 273.15 : u === 'fahrenheit' ? (k - 273.15) * 9/5 + 32 : k }
+            },
+            volume: { liters: 1, milliliters: 1000, gallons: 0.264172, quarts: 1.05669, pints: 2.11338, cups: 4.22675 }
+        };
+
+        function updateConverterUnits() {
+            const type = document.getElementById('conversion-type').value;
+            const fromUnit = document.getElementById('from-unit');
+            const toUnit = document.getElementById('to-unit');
+            fromUnit.innerHTML = '';
+            toUnit.innerHTML = '';
+
+            const units = Object.keys(conversions[type]);
+            units.forEach(u => {
+                fromUnit.innerHTML += `<option value="${u}">${u}</option>`;
+                toUnit.innerHTML += `<option value="${u}">${u}</option>`;
+            });
+            if (units.length > 1) toUnit.value = units[1];
+            convertUnits();
+        }
+
+        function convertUnits() {
+            const type = document.getElementById('conversion-type').value;
+            const val = parseFloat(document.getElementById('from-value').value) || 0;
+            const from = document.getElementById('from-unit').value;
+            const to = document.getElementById('to-unit').value;
+
+            let result;
+            if (type === 'temperature') {
+                result = conversions[type][from].to(val, to);
+            } else {
+                const inBase = val / conversions[type][from];
+                result = inBase * conversions[type][to];
+            }
+            document.getElementById('converter-result').textContent = result.toFixed(4);
+        }
+
+        document.getElementById('conversion-type').addEventListener('change', updateConverterUnits);
+        document.getElementById('from-value').addEventListener('input', convertUnits);
+        document.getElementById('from-unit').addEventListener('change', convertUnits);
+        document.getElementById('to-unit').addEventListener('change', convertUnits);
+
+        // ===== NOTES =====
+        function loadNotes() {
+            const notes = JSON.parse(storage.getItem('notes') || '[]');
+            const list = document.getElementById('notes-list');
+            if (notes.length === 0) {
+                list.innerHTML = '<div style="text-align:center;padding:2rem;color:var(--overlay0)">No notes yet</div>';
+                return;
+            }
+            list.innerHTML = notes.map((n, i) => `
+                <div class="note-item">
+                    <div class="note-header">
+                        <span class="note-time">${n.timestamp}</span>
+                        <button class="note-delete" data-index="${i}">Delete</button>
+                    </div>
+                    <div class="note-text">${n.text}</div>
+                </div>
+            `).join('');
+        }
+
+        document.getElementById('add-note-btn').addEventListener('click', () => {
+            const input = document.getElementById('note-input');
+            const text = input.value.trim();
+            if (!text) return;
+            const notes = JSON.parse(storage.getItem('notes') || '[]');
+            notes.unshift({ text, timestamp: new Date().toLocaleString() });
+            storage.setItem('notes', JSON.stringify(notes));
+            input.value = '';
+            loadNotes();
+        });
+
+        document.getElementById('notes-list').addEventListener('click', (e) => {
+            if (e.target.classList.contains('note-delete')) {
+                const notes = JSON.parse(storage.getItem('notes') || '[]');
+                notes.splice(parseInt(e.target.dataset.index), 1);
+                storage.setItem('notes', JSON.stringify(notes));
+                loadNotes();
+            }
+        });
+
+        // ===== TIMER =====
+        let timerInterval = null;
+        let timerRemaining = 300;
+        let timerRunning = false;
+
+        function formatTimer(s) {
+            const m = Math.floor(s / 60);
+            const sec = s % 60;
+            return `${String(m).padStart(2, '0')}:${String(sec).padStart(2, '0')}`;
+        }
+
+        function updateTimerDisplay() {
+            document.getElementById('timer-display').textContent = formatTimer(timerRemaining);
+        }
+
+        document.getElementById('timer-start').addEventListener('click', () => {
+            if (timerRunning) return;
+            timerRunning = true;
+            document.getElementById('timer-start').disabled = true;
+            document.getElementById('timer-pause').disabled = false;
+            timerInterval = setInterval(() => {
+                if (timerRemaining > 0) {
+                    timerRemaining--;
+                    updateTimerDisplay();
+                } else {
+                    clearInterval(timerInterval);
+                    timerRunning = false;
+                    document.getElementById('timer-display').textContent = 'Done!';
+                }
+            }, 1000);
+        });
+
+        document.getElementById('timer-pause').addEventListener('click', () => {
+            timerRunning = false;
+            clearInterval(timerInterval);
+            document.getElementById('timer-start').disabled = false;
+            document.getElementById('timer-pause').disabled = true;
+        });
+
+        document.getElementById('timer-reset').addEventListener('click', () => {
+            timerRunning = false;
+            clearInterval(timerInterval);
+            timerRemaining = 300;
+            updateTimerDisplay();
+            document.getElementById('timer-start').disabled = false;
+            document.getElementById('timer-pause').disabled = true;
+        });
+
+        document.querySelectorAll('.timer-preset').forEach(p => {
+            p.addEventListener('click', () => {
+                timerRunning = false;
+                clearInterval(timerInterval);
+                timerRemaining = parseInt(p.dataset.seconds);
+                updateTimerDisplay();
+                document.getElementById('timer-start').disabled = false;
+                document.getElementById('timer-pause').disabled = true;
+            });
+        });
+
+        updateTimerDisplay();
+
+        // ===== QR CODE =====
+        let qrCode = null;
+
+        document.getElementById('qr-input').addEventListener('input', (e) => {
+            const text = e.target.value.trim();
+            if (!text) return;
+            const display = document.getElementById('qr-display');
+            display.innerHTML = '';
+            qrCode = new QRCode(display, { text, width: 200, height: 200, colorDark: '#1e1e2e', colorLight: '#ffffff', correctLevel: QRCode.CorrectLevel.H });
+        });
+
+        document.getElementById('qr-download').addEventListener('click', () => {
+            const canvas = document.querySelector('#qr-display canvas');
+            if (!canvas) return;
+            const link = document.createElement('a');
+            link.download = 'qrcode.png';
+            link.href = canvas.toDataURL();
+            link.click();
+        });
+
+        // ===== COLOR PICKER =====
+        function hexToRgb(hex) {
+            const r = parseInt(hex.slice(1, 3), 16);
+            const g = parseInt(hex.slice(3, 5), 16);
+            const b = parseInt(hex.slice(5, 7), 16);
+            return { r, g, b };
+        }
+
+        function rgbToHsl(r, g, b) {
+            r /= 255; g /= 255; b /= 255;
+            const max = Math.max(r, g, b), min = Math.min(r, g, b);
+            let h, s, l = (max + min) / 2;
+            if (max === min) { h = s = 0; }
+            else {
+                const d = max - min;
+                s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+                switch (max) {
+                    case r: h = ((g - b) / d + (g < b ? 6 : 0)) / 6; break;
+                    case g: h = ((b - r) / d + 2) / 6; break;
+                    case b: h = ((r - g) / d + 4) / 6; break;
+                }
+            }
+            return { h: Math.round(h * 360), s: Math.round(s * 100), l: Math.round(l * 100) };
+        }
+
+        function updateColorValues(hex) {
+            document.getElementById('color-hex').textContent = hex;
+            const rgb = hexToRgb(hex);
+            document.getElementById('color-rgb').textContent = `rgb(${rgb.r}, ${rgb.g}, ${rgb.b})`;
+            const hsl = rgbToHsl(rgb.r, rgb.g, rgb.b);
+            document.getElementById('color-hsl').textContent = `hsl(${hsl.h}, ${hsl.s}%, ${hsl.l}%)`;
+        }
+
+        function loadSavedColors() {
+            const colors = JSON.parse(storage.getItem('saved-colors') || '[]');
+            const container = document.getElementById('saved-colors');
+            container.innerHTML = '';
+            for (let i = 0; i < 8; i++) {
+                const div = document.createElement('div');
+                div.className = 'saved-color' + (colors[i] ? '' : ' empty');
+                if (colors[i]) div.style.background = colors[i];
+                div.addEventListener('click', () => {
+                    if (colors[i]) {
+                        document.getElementById('color-picker').value = colors[i];
+                        updateColorValues(colors[i]);
+                    } else {
+                        colors[i] = document.getElementById('color-picker').value;
+                        storage.setItem('saved-colors', JSON.stringify(colors));
+                        loadSavedColors();
+                    }
+                });
+                container.appendChild(div);
+            }
+        }
+
+        document.getElementById('color-picker').addEventListener('input', (e) => updateColorValues(e.target.value));
+
+        ['color-hex', 'color-rgb', 'color-hsl'].forEach(id => {
+            document.getElementById(id).addEventListener('click', function() {
+                navigator.clipboard.writeText(this.textContent);
+            });
+        });
+
+        // ===== BREATHING =====
+        const breathingTechniques = {
+            '478': [{ phase: 'inhale', duration: 4, text: 'Breathe In' }, { phase: 'hold', duration: 7, text: 'Hold' }, { phase: 'exhale', duration: 8, text: 'Breathe Out' }],
+            'box': [{ phase: 'inhale', duration: 4, text: 'Breathe In' }, { phase: 'hold', duration: 4, text: 'Hold' }, { phase: 'exhale', duration: 4, text: 'Breathe Out' }, { phase: 'hold', duration: 4, text: 'Hold' }],
+            'calm': [{ phase: 'inhale', duration: 4, text: 'Breathe In' }, { phase: 'exhale', duration: 6, text: 'Breathe Out' }]
+        };
+
+        let breathingInterval = null;
+        let breathingActive = false;
+
+        document.getElementById('breathing-start').addEventListener('click', () => {
+            if (breathingActive) return;
+            breathingActive = true;
+            const technique = breathingTechniques[document.getElementById('breathing-select').value];
+            let stepIdx = 0;
+            let timeLeft = technique[stepIdx].duration;
+
+            function update() {
+                const step = technique[stepIdx];
+                document.getElementById('breathing-circle').className = step.phase;
+                document.getElementById('breathing-instruction').textContent = step.text;
+                document.getElementById('breathing-timer').textContent = timeLeft;
+
+                breathingInterval = setTimeout(() => {
+                    timeLeft--;
+                    if (timeLeft > 0) { update(); }
+                    else {
+                        stepIdx = (stepIdx + 1) % technique.length;
+                        timeLeft = technique[stepIdx].duration;
+                        update();
+                    }
+                }, 1000);
+            }
+            update();
+        });
+
+        document.getElementById('breathing-stop').addEventListener('click', () => {
+            breathingActive = false;
+            clearTimeout(breathingInterval);
+            document.getElementById('breathing-circle').className = '';
+            document.getElementById('breathing-instruction').textContent = 'Press Start';
+            document.getElementById('breathing-timer').textContent = '0';
+        });
+
+        // ===== GAME =====
+        let gameScore = parseInt(storage.getItem('game-score') || '0');
+        document.getElementById('game-score').textContent = gameScore;
+
+        function incrementScore() {
+            gameScore++;
+            document.getElementById('game-score').textContent = gameScore;
+            storage.setItem('game-score', gameScore);
+            const btn = document.getElementById('game-click-btn');
+            btn.style.transform = 'scale(0.9)';
+            setTimeout(() => btn.style.transform = '', 100);
+        }
+
+        document.getElementById('game-click-btn').addEventListener('click', incrementScore);
+        document.getElementById('game-reset').addEventListener('click', () => {
+            gameScore = 0;
+            document.getElementById('game-score').textContent = 0;
+            storage.setItem('game-score', '0');
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.code === 'Space' && document.getElementById('game-modal').classList.contains('open')) {
+                e.preventDefault();
+                incrementScore();
+            }
+        });
+
+        // ===== INIT =====
+        window.onload = () => {
+            document.body.classList.add('loaded');
+        };
+
+        // Detect system theme preference
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            if (!storage.getItem('theme')) storage.setItem('theme', 'dark');
+        }
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
+            if (!storage.getItem('theme')) {
+                storage.setItem('theme', event.matches ? 'dark' : 'light');
+                applyTheme();
+            }
+        });
+    </script>
+</body>
+</html>
+
