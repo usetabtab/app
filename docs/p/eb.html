@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" >
+    <meta name="viewport" content="width=device-width, initial-scale=1" >
+    <title>New Tab</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" >
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" >
+    <style>
+        html {
+            overflow: hidden;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            color: var(--text-color);
+            transition: background-color 0.3s ease, color 0.3s ease;
+            overflow: hidden;
+            position: relative;
+            background-size: cover;
+            background-position: center center;
+            background-repeat: no-repeat;
+            opacity: 0;
+            transition: opacity 1s ease-in-out;
+        }
+
+
+
+
+        body.loaded {
+            opacity: 1;
+        }
+
+
+
+
+        body.light {
+            --bg-color: #f0f2f5;
+            --text-color: #333;
+            --icon-color: #555;
+            --icon-hover: #000;
+            --icon-bg-hover: rgba(0, 0, 0, 0.05);
+            --line-color: rgba(0, 0, 0, 0.1);
+            --overlay-color: rgba(255, 255, 255, 0.4);
+            --grid-opacity: 0.08;
+            --terminal-bg: rgba(255, 255, 255, 0.85);
+            --terminal-border: rgba(0, 0, 0, 0.1);
+            --terminal-text: #333;
+            --terminal-prompt: #5D5CDE;
+            --terminal-error: #dc2626;
+            --terminal-success: #16a34a;
+        }
+
+
+
+
+        body.dark {
+            --bg-color: #1a202c;
+            --text-color: #e2e8f0;
+            --icon-color: #cbd5e0;
+            --icon-hover: #fff;
+            --icon-bg-hover: rgba(255, 255, 255, 0.1);
+            --line-color: rgba(255, 255, 255, 0.1);
+            --overlay-color: rgba(0, 0, 0, 0.4);
+            --grid-opacity: 0.08;
+            --terminal-bg: rgba(26, 32, 44, 0.85);
+            --terminal-border: rgba(255, 255, 255, 0.1);
+            --terminal-text: #e2e8f0;
+            --terminal-prompt: #818cf8;
+            --terminal-error: #f87171;
+            --terminal-success: #4ade80;
+        }
+
+
+
+
+        #image-overlay {
+            background-color: var(--overlay-color);
+            transition: background-color 0.3s ease;
+            z-index: -1;
+        }
+
+
+
+
+        .theme-toggle-icon {
+            fill: var(--icon-color);
+            transition: fill 0.3s ease;
+            padding: 0.75rem;
+            border-radius: 9999px;
+            cursor: pointer;
+        }
+
+
+
+
+        .theme-toggle-icon:hover {
+            fill: var(--icon-hover);
+            background-color: var(--icon-bg-hover);
+        }
+
+
+
+
+        .theme-toggle-icon:active {
+            transform: scale(0.95);
+        }
+
+
+
+
+        #terminal {
+            font-family: 'JetBrains Mono', monospace;
+            background: var(--terminal-bg);
+            border: 1px solid var(--terminal-border);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            transition: background-color 0.3s ease, border-color 0.3s ease;
+        }
+
+
+
+
+        #terminal-output {
+            color: var(--terminal-text);
+            font-size: 14px;
+            line-height: 1.5;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: var(--terminal-border) transparent;
+        }
+
+
+
+
+        #terminal-output::-webkit-scrollbar {
+            width: 6px;
+        }
+
+
+
+
+        #terminal-output::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+
+
+
+        #terminal-output::-webkit-scrollbar-thumb {
+            background: var(--terminal-border);
+            border-radius: 3px;
+        }
+
+
+
+
+        #terminal-input {
+            font-family: 'JetBrains Mono', monospace;
+            background: transparent;
+            border: none;
+            outline: none;
+            color: var(--terminal-text);
+            font-size: 14px;
+            flex: 1;
+        }
+
+
+
+
+        .terminal-prompt {
+            color: var(--terminal-prompt);
+            font-weight: 500;
+        }
+
+
+
+
+        .terminal-error {
+            color: var(--terminal-error);
+        }
+
+
+
+
+        .terminal-success {
+            color: var(--terminal-success);
+        }
+
+
+
+
+        .terminal-info {
+            color: var(--terminal-prompt);
+        }
+
+
+
+
+        .terminal-line {
+            margin-bottom: 4px;
+        }
+    </style>
+</head>
+<body class="light">
+    <div id="image-overlay" class="absolute inset-0"></div>
+    <div id="app" class="min-h-screen relative flex p-8 z-0">
+        <!-- Left side content -->
+        <div class="flex-1 flex flex-col justify-between">
+            <div>
+                <div class="absolute top-8 left-8 flex space-x-4 z-20">
+                    <a href="https://github.com" class="flex items-center justify-center w-10 h-10 bg-gray-200 dark:bg-gray-700 rounded-full hover:bg-gray-300 dark:hover:bg-gray-600 transition">
+                        <i class="fab fa-github text-gray-800 dark:text-gray-200"></i>
+                    </a>
+                    <a href="https://dashboard.render.com" class="flex items-center justify-center w-10 h-10 bg-gray-200 dark:bg-gray-700 rounded-full hover:bg-gray-300 dark:hover:bg-gray-600 transition">
+                        <i class="fas fa-tachometer-alt text-gray-800 dark:text-gray-200"></i>
+                    </a>
+                    <a href="https://htmlvi.onrender.com" class="flex items-center justify-center w-10 h-10 bg-gray-200 dark:bg-gray-700 rounded-full hover:bg-gray-300 dark:hover:bg-gray-600 transition">
+                        <i class="fas fa-coffee text-gray-800 dark:text-gray-200"></i>
+                    </a>
+                    <a href="https://poe.com" class="flex items-center justify-center w-10 h-10 bg-gray-200 dark:bg-gray-700 rounded-full hover:bg-gray-300 dark:hover:bg-gray-600 transition">
+                        <i class="fas fa-robot text-gray-800 dark:text-gray-200"></i>
+                    </a>
+                    <button id="themeToggle" class="transform -translate-x-1/2 focus:outline-none hidden">
+                        <svg id="sunIcon" class="theme-toggle-icon w-8 h-8 md:w-10 md:h-10" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: none;">
+                            <circle cx="12" cy="12" r="5"></circle>
+                            <line x1="12" y1="1" x2="12" y2="3"></line>
+                            <line x1="12" y1="21" x2="12" y2="23"></line>
+                            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                            <line x1="1" y1="12" x2="3" y2="12"></line>
+                            <line x1="21" y1="12" x2="23" y2="12"></line>
+                            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                        </svg>
+                        <svg id="moonIcon" class="theme-toggle-icon w-8 h-8 md:w-10 md:h-10" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+
+
+
+            <div class="absolute bottom-8 left-8 text-left">
+                <div id="time" class="text-5xl md:text-7xl lg:text-8xl font-bold"></div>
+                <div id="date" class="text-lg md:text-xl lg:text-2xl mt-1 md:mt-2 opacity-80"></div>
+            </div>
+        </div>
+
+
+
+
+        <!-- Terminal on the right -->
+        <div id="terminal" class="w-96 h-[calc(100vh-4rem)] rounded-lg shadow-2xl flex flex-col overflow-hidden">
+            <div class="px-4 py-3 border-b border-gray-300 dark:border-gray-600 flex items-center justify-between">
+                <div class="flex items-center space-x-2">
+                    <div class="w-3 h-3 bg-red-500 rounded-full"></div>
+                    <div class="w-3 h-3 bg-yellow-500 rounded-full"></div>
+                    <div class="w-3 h-3 bg-green-500 rounded-full"></div>
+                </div>
+                <span class="text-sm opacity-70">Terminal</span>
+            </div>
+            <div id="terminal-output" class="flex-1 p-4 overflow-y-auto"></div>
+            <div class="px-4 py-3 border-t border-gray-300 dark:border-gray-600 flex items-center">
+                <span class="terminal-prompt mr-2">❯</span>
+                <input id="terminal-input" type="text" autocomplete="off" placeholder="Type 'help' for commands..." >
+            </div>
+        </div>
+    </div>
+    <script>
+        const timeElement = document.getElementById('time');
+        const dateElement = document.getElementById('date');
+        const themeToggle = document.getElementById('themeToggle');
+        const sunIcon = document.getElementById('sunIcon');
+        const moonIcon = document.getElementById('moonIcon');
+        const body = document.body;
+        const terminalOutput = document.getElementById('terminal-output');
+        const terminalInput = document.getElementById('terminal-input');
+
+        // Command history
+        let commandHistory = [];
+        let historyIndex = -1;
+
+
+
+
+        const imagePaths = [
+            "../assets/slideshow/1.jpg",
+            "../assets/slideshow/2.jpg",
+            "../assets/slideshow/3.jpg",
+            "../assets/slideshow/4.jpg",
+            "../assets/slideshow/5.jpg",
+            "../assets/slideshow/6.jpg",
+            "../assets/slideshow/7.jpg",
+            "../assets/slideshow/8.jpg",
+            "../assets/slideshow/9.jpg",
+            "../assets/slideshow/10.jpg",
+            "../assets/slideshow/11.jpg",
+            "../assets/slideshow/12.jpg",
+            "../assets/slideshow/13.jpg"
+        ];
+
+
+
+
+        const quickTypes = {
+            "gh": "https://github.com",
+            "render": "https://dashboard.render.com",
+            "google": "https://www.google.com",
+            "hv": "https://htmlvi.onrender.com"
+        };
+
+
+
+
+        // Terminal commands JSON structure
+        const terminalCommands = {
+            "help": {
+                description: "Show all available commands",
+                action: function() {
+                    let helpText = '<div class="terminal-info">Available Commands:</div>';
+                    for (const [cmd, data] of Object.entries(terminalCommands)) {
+                        helpText += `<div class="ml-4"><span class="terminal-success">${cmd}</span> - ${data.description}</div>`;
+                    }
+                    return helpText;
+                }
+            },
+            "clear": {
+                description: "Clear the terminal",
+                action: function() {
+                    terminalOutput.innerHTML = '';
+                    return null;
+                }
+            },
+            "time": {
+                description: "Show current time",
+                action: function() {
+                    const now = new Date();
+                    const timeStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
+                    return `<span class="terminal-success">Current time: ${timeStr}</span>`;
+                }
+            },
+            "date": {
+                description: "Show current date",
+                action: function() {
+                    const now = new Date();
+                    const dateStr = now.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+                    return `<span class="terminal-success">Current date: ${dateStr}</span>`;
+                }
+            },
+            "theme": {
+                description: "Toggle light/dark theme",
+                action: function() {
+                    toggleTheme();
+                    const currentTheme = body.classList.contains('dark') ? 'dark' : 'light';
+                    return `<span class="terminal-success">Theme switched to ${currentTheme} mode</span>`;
+                }
+            },
+            "open": {
+                description: "Open a website (e.g., open google.com)",
+                action: function(param) {
+                    if (!param) {
+                        return '<span class="terminal-error">Error: Please provide a URL</span>';
+                    }
+                    let url = param;
+                    if (!/^https?:\/\//i.test(url)) {
+                        url = 'https://' + url;
+                    }
+                    window.location.href = url;
+                    return `<span class="terminal-success">Navigating to ${url}...</span>`;
+                }
+            },
+            "/": {
+                description: "Open a website (e.g., / google.com)",
+                action: function(param) {
+                    if (!param) {
+                        return '<span class="terminal-error">Error: Please provide a URL</span>';
+                    }
+                    let url = param;
+                    if (!/^https?:\/\//i.test(url)) {
+                        url = 'https://' + url;
+                    }
+                    window.location.href = url;
+                    return `<span class="terminal-success">Navigating to ${url}...</span>`;
+                }
+            },
+            "search": {
+                description: "Search on Google (e.g., search javascript)",
+                action: function(param) {
+                    if (!param) {
+                        return '<span class="terminal-error">Error: Please provide a search query</span>';
+                    }
+                    const searchUrl = 'https://www.google.com/search?q=' + encodeURIComponent(param);
+                    window.location.href = searchUrl;
+                    return `<span class="terminal-success">Searching for "${param}"...</span>`;
+                }
+            },
+            "gh": {
+                description: "Open a GitHub page (e.g., gh user/repo)",
+                action: function(param) {
+                    if (!param) {
+                        window.location.href = 'https://github.com';
+                        return '<span class="terminal-success">Opening GitHub...</span>';
+                    } else {
+                        url = `https://github.com/${param}`;
+                        window.location.href = url;
+                        return `<span class="terminal-success">Opening GitHub: ${param}...</span>`;
+                    }
+                }
+            },
+            "render": {
+                description: "Open Render Dashboard",
+                action: function() {
+                    window.location.href = 'https://dashboard.render.com';
+                    return '<span class="terminal-success">Opening Render Dashboard...</span>';
+                }
+            },
+            "ai": {
+                description: "Open an AI",
+                action: function(param) {
+                    switch (param) {
+                        case "poe":
+                            window.location.href = 'https://poe.com';
+                            return '<span class="terminal-success">Opening Poe...</span>';
+                        case "blackbox":
+                            window.location.href = 'https://blackbox.ai';
+                            return '<span class="terminal-success">Opening BlackBox...</span>';
+                        case "perplexity":
+                            window.location.href = 'https://perplexity.ai';
+                            return '<span class="terminal-success">Opening Perplexity...</span>';
+                        default:
+                            return '<span class="terminal-error">Error: please provide an AI name</span>';
+                    }
+                }
+            },
+            "echo": {
+                description: "Echo text (e.g., echo hello world)",
+                action: function(param) {
+                    if (!param) {
+                        return '<span class="terminal-error">Error: Nothing to echo</span>';
+                    }
+                    return `<span>${param}</span>`;
+                }
+            },
+            "bg": {
+                description: "Change background image",
+                action: function() {
+                    changeBackgroundImage();
+                    return '<span class="terminal-success">Background image changed</span>';
+                }
+            },
+            "nadd": {
+                description: "Add a note (e.g., nadd buy milk)",
+                action: function(param) {
+                    if (!param) {
+                        return '<span class="terminal-error">Error: Please provide note text</span>';
+                    }
+
+                    // Get existing notes from localStorage
+                    // eslint-disable-next-line no-restricted-globals
+                    let notes = JSON.parse(localStorage.getItem('terminal-notes') || '[]');
+
+                    // Add new note with timestamp
+                    const note = {
+                        id: Date.now(),
+                        text: param,
+                        timestamp: new Date().toLocaleString()
+                    };
+                    notes.push(note);
+
+                    // Save to localStorage
+                    // eslint-disable-next-line no-restricted-globals
+                    localStorage.setItem('terminal-notes', JSON.stringify(notes));
+
+                    return `<span class="terminal-success">Note added: "${param}"</span>`;
+                }
+            },
+            "nview": {
+                description: "View all saved notes",
+                action: function() {
+                    // eslint-disable-next-line no-restricted-globals
+                    const notes = JSON.parse(localStorage.getItem('terminal-notes') || '[]');
+
+                    if (notes.length === 0) {
+                        return '<span class="terminal-info">No notes saved yet. Use "nadd [text]" to add a note.</span>';
+                    }
+
+                    let output = '<div class="terminal-info">Saved Notes:</div>';
+                    notes.forEach((note, index) => {
+                        output += `<div class="ml-4 mb-2">
+                            <span class="terminal-success">[${index + 1}]</span>
+                            <span class="opacity-70 text-xs">${note.timestamp}</span><br>
+                            <span class="ml-8">${note.text}</span>
+                        </div>`;
+                    });
+
+                    return output;
+                }
+            },
+            "nclear": {
+                description: "Clear all saved notes",
+                action: function() {
+                    // eslint-disable-next-line no-restricted-globals
+                    localStorage.removeItem('terminal-notes');
+                    return '<span class="terminal-success">All notes cleared</span>';
+                }
+            },
+            "run": {
+                description: "Run a line of JavaScript",
+                action: function(param) {
+                    if (!param) {
+                        return '<span class="terminal-error">Error: No code provided to run</span>';
+                    }
+                    try {
+                        eval(param);
+                        return '<span class="terminal-success">Completed running JavaScript...</span>';
+                    } catch (error) {
+                        return `<span class="terminal-error">Error: ${error.message}</span>`;
+                    }
+                }
+            }
+        };
+
+
+
+
+        function addToTerminal(content, includePrompt = true) {
+            if (content === null) return;
+
+            const line = document.createElement('div');
+            line.className = 'terminal-line';
+
+            if (includePrompt) {
+                line.innerHTML = `<span class="terminal-prompt">❯</span> ${content}`;
+            } else {
+                line.innerHTML = content;
+            }
+
+            terminalOutput.appendChild(line);
+            terminalOutput.scrollTop = terminalOutput.scrollHeight;
+        }
+
+        function replaceQuotes(input) {
+            return input
+                .replace(/[“”]/g, '"')  // Replace smart quotes with double quotes
+                .replace(/[‘’]/g, "'")  // Replace smart single quotes with single quotes
+                .replace(/“|”/g, '"')   // Additional replacements for any edge cases
+                .replace(/‘|’/g, "'");
+        }
+
+        async function executeCommand(input) {
+            const trimmedInput = input.trim();
+            if (!trimmedInput) return;
+        
+            // Replace quotes in the command input
+            const sanitizedInput = replaceQuotes(trimmedInput);
+            addToTerminal(sanitizedInput); // Log the command
+        
+            const spaceIndex = sanitizedInput.indexOf(' ');
+            let command = spaceIndex === -1 ? sanitizedInput : sanitizedInput.substring(0, spaceIndex);
+            let param = spaceIndex === -1 ? '' : sanitizedInput.substring(spaceIndex + 1).trim();
+        
+            if (terminalCommands[command]) {
+                const result = await terminalCommands[command].action(param);
+                if (result !== null) {
+                    addToTerminal(result, false);
+                }
+            } else {
+                addToTerminal(`<span class="terminal-error">Command not found: ${command}</span>`, false);
+            }
+        }
+
+
+
+
+        // Terminal input handler
+        terminalInput.addEventListener('keydown', function(event) {
+            if (event.key === 'Enter') {
+                const input = this.value;
+                executeCommand(input);
+                this.value = '';
+            } else if (event.key === 'Escape') {
+                this.value = '';
+                this.blur();
+            }
+        });
+
+
+
+
+        function updateTime() {
+            const now = new Date();
+            const timeOptions = { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false };
+            const currentTime = now.toLocaleTimeString('en-US', timeOptions);
+            timeElement.textContent = currentTime;
+            const dateOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            const currentDate = now.toLocaleDateString('en-US', dateOptions);
+            dateElement.textContent = currentDate;
+        }
+
+
+
+
+        function changeBackgroundImage() {
+            if (imagePaths.length === 0) {
+                console.warn("No images found in the imagePaths array.");
+                return;
+            }
+            const randomIndex = Math.floor(Math.random() * imagePaths.length);
+            const imageUrl = imagePaths[randomIndex];
+            body.style.backgroundImage = `url('${imageUrl}')`;
+        }
+        
+        window.onload = function () {
+            body.classList.add('dark');
+            updateTime();
+            setInterval(updateTime, 1000);
+            changeBackgroundImage();
+            body.classList.add('loaded');
+            setInterval(changeBackgroundImage, 60 * 1000);
+            
+            // Welcome message
+            addToTerminal('<span class="terminal-info">Welcome to DevTerm! Type "help" to see available commands.</span>', false);
+        };
+        
+        // Focus search bar on Cmd+U
+        window.addEventListener('keydown', function (event) {
+            if (event.metaKey && event.key.toLowerCase() === 'u') {
+                event.preventDefault();
+                document.getElementById('searchBar').focus();
+            }
+        });
+
+
+
+
+        // Handle Enter key in the search bar for URLs and search queries
+        document.getElementById('searchBar').addEventListener('keydown', function (event) {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                let query = this.value.trim();
+                if (quickTypes[query]) {
+                    window.location.href = quickTypes[query];
+                } else if (query.startsWith('/')) {
+                    const url = 'https://' + query.slice(1);
+                    window.location.href = url;
+                } else {
+                    const urlPattern = /^(https?:\/\/|www\.)/i;
+                    if (urlPattern.test(query)) {
+                        if (!/^https?:\/\//i.test(query)) {
+                            query = 'http://' + query;
+                        }
+                        window.location.href = query;
+                    } else {
+                        const searchUrl = 'https://www.google.com/search?q=' + encodeURIComponent(query);
+                        window.location.href = searchUrl;
+                    }
+                }
+            } else if (event.key === 'Escape') {
+                this.value = '';
+                this.blur();
+            }
+        });
+    </script>
+</body>
+</html>

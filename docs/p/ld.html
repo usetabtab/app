@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>New Tab</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+
+  <style>
+    :root {
+      --text-color: #333;
+      --light-bg-color: rgba(255, 255, 255, 0.85);
+      --button-bg-color: #007bff;
+      --button-hover-color: #0056b3;
+      --clear-button-color: #dc3545;
+      --clear-button-hover-color: #c82333;
+      --shadow-light: 0 4px 15px rgba(0, 0, 0, 0.1);
+      --shadow-medium: 0 6px 20px rgba(0, 0, 0, 0.15);
+    }
+    body {
+      margin: 0;
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      color: var(--text-color);
+      font-family: 'Poppins', sans-serif;
+      background-color: #f0f2f5;
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      transition: background-image 0.5s ease-in-out, background-color 0.5s ease-in-out;
+    }
+    body.dark-text { color: var(--text-color); }
+    body.light-text { color: white; }
+    body.dark-mode { background-color: #111; color: #eee; }
+    #search-bar {
+      position: absolute;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 90%;
+      max-width: 800px;
+      display: flex;
+      background: var(--light-bg-color);
+      border-radius: 50px;
+      box-shadow: var(--shadow-light);
+      overflow: hidden;
+      backdrop-filter: blur(8px);
+    }
+    #search-input {
+      flex: 1;
+      padding: 14px 20px;
+      border: none;
+      outline: none;
+      font-size: 1.1em;
+      background: transparent;
+    }
+    #search-button {
+      background: var(--button-bg-color);
+      border: none;
+      padding: 0 20px;
+      font-size: 1.2em;
+      cursor: pointer;
+      color: white;
+      transition: background-color 0.2s ease;
+    }
+    #search-button:hover {
+      background: var(--button-hover-color);
+    }
+    #time-container {
+      text-align: center;
+      background-color: var(--light-bg-color);
+      padding: 40px 60px;
+      border-radius: 15px;
+      box-shadow: var(--shadow-medium);
+      backdrop-filter: blur(8px);
+      transition: background-color 0.3s ease;
+      cursor: move;
+      user-select: none;
+      position: absolute;
+    }
+    #time {
+      font-size: 7em;
+      font-weight: 600;
+      margin-bottom: 5px;
+      letter-spacing: -2px;
+    }
+    #date {
+      font-size: 2.2em;
+      font-weight: 300;
+      text-transform: capitalize;
+    }
+    #upload-section {
+      position: absolute;
+      bottom: 25px;
+      right: 25px;
+      background-color: var(--light-bg-color);
+      padding: 12px 20px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      box-shadow: var(--shadow-light);
+      backdrop-filter: blur(8px);
+      transition: background-color 0.3s ease;
+    }
+    #upload-section label,
+    #clearImage, 
+    #themeToggle,
+    #recentreBtn {
+      cursor: pointer;
+      background-color: var(--button-bg-color);
+      color: white;
+      width: 40px; height: 40px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border-radius: 8px;
+      border: none;
+      font-size: 1.2em;
+      transition: background-color 0.2s, transform 0.1s;
+    }
+    #upload-section label:hover, #themeToggle:hover, #recentreBtn:hover { 
+      background-color: var(--button-hover-color); 
+      transform: translateY(-1px);
+    }
+    #clearImage { background-color: var(--clear-button-color); }
+    #clearImage:hover { background-color: var(--clear-button-hover-color); transform: translateY(-1px); }
+    #bgFileInput { display: none; }
+    @media (max-width:992px) {
+      #time { font-size: 5.5em;}
+      #date { font-size: 1.8em;}
+      #time-container { padding: 30px 45px;}
+      #upload-section { bottom: 20px; right: 20px;}
+    }
+    @media (max-width:768px) {
+      #time { font-size: 4em;}
+      #date { font-size: 1.5em;}
+      #time-container { padding: 25px 35px;}
+      #upload-section {
+        left: 50%; right: auto; bottom: 15px;
+        transform: translateX(-50%);
+      }
+    }
+    @media (max-width:480px) {
+      #time { font-size: 3em;}
+      #date { font-size: 1.2em;}
+      #time-container { padding: 20px 30px;}
+    }
+  </style>
+</head>
+<body>
+  <!-- Search -->
+  <div id="search-bar">
+    <input type="text" id="search-input" placeholder="Search the web...">
+    <button id="search-button"><i class="fas fa-search"></i></button>
+  </div>
+  <!-- Clock -->
+  <div id="time-container">
+    <div id="time"></div>
+    <div id="date"></div>
+  </div>
+  <!-- Controls -->
+  <div id="upload-section">
+    <input type="file" id="bgFileInput" accept="image/*">
+    <label for="bgFileInput" title="Upload Background"><i class="fas fa-cloud-arrow-up"></i></label>
+    <button id="clearImage" title="Clear Background"><i class="fas fa-trash-can"></i></button>
+    <button id="themeToggle" title="Toggle Theme"><i class="fas fa-moon"></i></button>
+    <button id="recentreBtn" title="Re-centre"><i class="fas fa-crosshairs"></i></button>
+  </div>
+  <script>
+    const timeElement = document.getElementById('time');
+    const dateElement = document.getElementById('date');
+    const body = document.body;
+    const bgFileInput = document.getElementById('bgFileInput');
+    const clearImageButton = document.getElementById('clearImage');
+    const timeContainer = document.getElementById('time-container');
+    const uploadSection = document.getElementById('upload-section');
+    const themeToggle = document.getElementById('themeToggle');
+    const searchButton = document.getElementById('search-button');
+    const searchInput = document.getElementById('search-input');
+    const recentreBtn = document.getElementById('recentreBtn');
+
+    function updateTimeAndDate() {
+      const now = new Date();
+      const timeOptions = {hour: '2-digit', minute:'2-digit', second:'2-digit', hour12:false};
+      const dateOptions = {weekday:'long', year:'numeric', month:'long', day:'numeric'};
+      timeElement.textContent = now.toLocaleTimeString('en-US', timeOptions);
+      dateElement.textContent = now.toLocaleDateString('en-US', dateOptions);
+    }
+    function loadBackgroundImage() {
+      const savedImage = localStorage.getItem('backgroundImage');
+      if (savedImage) {
+        body.style.backgroundImage = `url(${savedImage})`;
+        body.style.backgroundColor = 'transparent';
+      } else { clearImageStyles(); }
+    }
+    function clearImage() {
+      localStorage.removeItem('backgroundImage');
+      bgFileInput.value = '';
+      clearImageStyles();
+    }
+    function clearImageStyles() {
+      body.style.backgroundImage = 'none';
+      body.style.backgroundColor = '#f0f2f5';
+    }
+    bgFileInput.addEventListener('change', e=>{
+      const file = e.target.files[0];
+      if(file){
+        const reader = new FileReader();
+        reader.onload = ev=>{
+          body.style.backgroundImage = `url(${ev.target.result})`;
+          localStorage.setItem('backgroundImage', ev.target.result);
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+    clearImageButton.addEventListener('click', clearImage);
+    // Theme Toggle
+    themeToggle.addEventListener('click', ()=>{
+      body.classList.toggle('dark-mode');
+      localStorage.setItem('darkMode', body.classList.contains('dark-mode'));
+      themeToggle.innerHTML = body.classList.contains('dark-mode') ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+    });
+    if(localStorage.getItem('darkMode')==='true'){
+      body.classList.add('dark-mode');
+      themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+    }
+
+    // Recentre
+    function centreClock() {
+      timeContainer.style.left = '50%';
+      timeContainer.style.top = '50%';
+      timeContainer.style.transform = 'translate(-50%, -50%)';
+      localStorage.setItem('clockPos', JSON.stringify({
+        left: '50%',
+        top: '50%',
+        transform: 'translate(-50%, -50%)'
+      }));
+    }
+    recentreBtn.addEventListener('click', centreClock);
+
+    // On load, restore position
+    const savedPos = localStorage.getItem('clockPos');
+    if(savedPos){
+      const {left,top,transform} = JSON.parse(savedPos);
+      timeContainer.style.left = left;
+      timeContainer.style.top = top;
+      timeContainer.style.transform = transform || '';
+    } else {
+      centreClock();
+    }
+
+    // Mouse drag:
+    let dragging = false, offsetX = 0, offsetY = 0;
+    timeContainer.addEventListener('mousedown', e=>{
+      dragging=true;
+      offsetX = e.clientX - timeContainer.offsetLeft;
+      offsetY = e.clientY - timeContainer.offsetTop;
+      timeContainer.style.transform = '';
+    });
+    document.addEventListener('mousemove', e=>{
+      if(dragging){
+        timeContainer.style.left = `${e.clientX - offsetX}px`;
+        timeContainer.style.top = `${e.clientY - offsetY}px`;
+      }
+    });
+    document.addEventListener('mouseup', ()=>{
+      if(dragging){
+        dragging=false;
+        localStorage.setItem('clockPos', JSON.stringify({
+          left: timeContainer.style.left,
+          top: timeContainer.style.top,
+          transform: ''
+        }));
+      }
+    });
+
+    // Touch drag fix
+    let touchDragging = false, touchOffsetX = 0, touchOffsetY = 0;
+    timeContainer.addEventListener('touchstart', function(e){
+      if(e.touches.length === 1){
+        const touch = e.touches[0];
+        touchDragging = true;
+        touchOffsetX = touch.clientX - timeContainer.offsetLeft;
+        touchOffsetY = touch.clientY - timeContainer.offsetTop;
+        timeContainer.style.transform = '';
+        e.preventDefault();
+      }
+    }, { passive: false });
+
+    document.addEventListener('touchmove', function(e){
+      if(touchDragging && e.touches.length === 1){
+        const touch = e.touches[0];
+        let newX = touch.clientX - touchOffsetX;
+        let newY = touch.clientY - touchOffsetY;
+        timeContainer.style.left = newX + 'px';
+        timeContainer.style.top = newY + 'px';
+        e.preventDefault();
+      }
+    }, { passive: false });
+
+    document.addEventListener('touchend', function(e){
+      if(touchDragging){
+        touchDragging = false;
+        localStorage.setItem('clockPos', JSON.stringify({
+          left: timeContainer.style.left,
+          top: timeContainer.style.top,
+          transform: ''
+        }));
+        e.preventDefault();
+      }
+    }, { passive: false });
+
+    // Search
+    searchButton.addEventListener('click', ()=>{
+      const q = searchInput.value.trim();
+      if(q) window.open(`https://www.google.com/search?q=${encodeURIComponent(q)}`, '_self');
+    });
+    searchInput.addEventListener('keypress', e=>{
+      if(e.key==='Enter') searchButton.click();
+    });
+
+    // Init
+    updateTimeAndDate();
+    loadBackgroundImage();
+    setInterval(updateTimeAndDate, 1000);
+  </script>
+</body>
+</html>

@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New Tab</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#5D5CDE',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .fade-in {
+            animation: fadeIn 1.5s ease-in-out;
+        }
+
+        .image-slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            opacity: 0;
+            transition: opacity 1.5s ease-in-out;
+        }
+
+        .image-slide.active {
+            opacity: 1;
+        }
+
+        .content-overlay {
+            position: relative;
+            z-index: 10;
+        }
+
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .dark .glass-effect {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .search-input:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(93, 92, 222, 0.5);
+        }
+
+        input::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .dark input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+    </style>
+</head>
+<body class="m-0 p-0 overflow-hidden">
+    <!-- Background Slideshow Container -->
+    <div id="slideshow" class="fixed inset-0 bg-gray-100 dark:bg-gray-900"></div>
+
+    <!-- Dark overlay for better text readability -->
+    <div class="fixed inset-0 bg-black opacity-30 dark:opacity-50" style="z-index: 1;"></div>
+
+    <!-- Main Content -->
+    <div class="content-overlay fixed inset-0 flex flex-col items-center justify-center p-4">
+        <!-- Dark Mode Toggle -->
+        <button id="themeToggle" class="absolute top-6 right-6 p-3 rounded-full glass-effect text-white hover:bg-white hover:bg-opacity-20 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-primary">
+            <svg id="sunIcon" class="w-6 h-6 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
+            </svg>
+            <svg id="moonIcon" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
+            </svg>
+        </button>
+
+        <!-- Time and Date -->
+        <div class="text-center mb-12 fade-in">
+            <h1 id="time" class="text-7xl md:text-8xl font-bold text-white mb-2 tracking-tight">00:00</h1>
+            <p id="date" class="text-xl md:text-2xl text-white opacity-90 font-light">Loading...</p>
+        </div>
+
+        <!-- Search Bar -->
+        <div class="w-full max-w-2xl px-4 fade-in">
+            <form id="searchForm" class="relative">
+                <input
+                    type="text"
+                    id="searchInput"
+                    class="w-full px-6 py-4 text-base md:text-lg rounded-full glass-effect text-white search-input transition-all duration-300"
+                    placeholder="Search the web..."
+                    autocomplete="off"
+                >
+                <button type="submit" class="absolute right-2 top-1/2 transform -translate-y-1/2 p-3 rounded-full bg-primary text-white hover:bg-opacity-90 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-white">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                    </svg>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Theme Management
+        const themeToggle = document.getElementById('themeToggle');
+        const sunIcon = document.getElementById('sunIcon');
+        const moonIcon = document.getElementById('moonIcon');
+        const html = document.documentElement;
+
+        // Use system preference for initial theme
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            html.classList.add('dark');
+            sunIcon.classList.remove('hidden');
+            moonIcon.classList.add('hidden');
+        }
+
+        themeToggle.addEventListener('click', () => {
+            html.classList.toggle('dark');
+            const isDark = html.classList.contains('dark');
+
+            sunIcon.classList.toggle('hidden', !isDark);
+            moonIcon.classList.toggle('hidden', isDark);
+        });
+
+        // Listen for system theme changes
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
+            if (event.matches) {
+                html.classList.add('dark');
+                sunIcon.classList.remove('hidden');
+                moonIcon.classList.add('hidden');
+            } else {
+                html.classList.remove('dark');
+                sunIcon.classList.add('hidden');
+                moonIcon.classList.remove('hidden');
+            }
+        });
+
+        // Time and Date
+        function updateTime() {
+            const now = new Date();
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            document.getElementById('time').textContent = `${hours}:${minutes}`;
+
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            document.getElementById('date').textContent = now.toLocaleDateString('en-US', options);
+        }
+
+        updateTime();
+        setInterval(updateTime, 3000);
+
+        // Image Slideshow
+        const slideshow = document.getElementById('slideshow');
+        const images = [
+            'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1920&q=80', // Mountain landscape
+            'https://images.unsplash.com/photo-1511884642898-4c92249e20b6?w=1920&q=80', // Ocean waves
+            'https://images.unsplash.com/photo-1518895949257-7621c3c786d7?w=1920&q=80', // Aurora
+            'https://images.unsplash.com/photo-1475274047050-1d0c0975c63e?w=1920&q=80', // Desert
+            'https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=1920&q=80', // Forest
+            'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=1920&q=80', // Lake
+            'https://images.unsplash.com/photo-1447752875215-b2761acb3c5d?w=1920&q=80', // Meadow
+            'https://images.unsplash.com/photo-1501594907352-04cda38ebc29?w=1920&q=80', // Tropical
+        ];
+
+        let currentIndex = 0;
+        let slides = [];
+
+        // Create slide elements
+        images.forEach((imageUrl, index) => {
+            const slide = document.createElement('div');
+            slide.className = 'image-slide';
+            slide.style.backgroundImage = `url('${imageUrl}')`;
+            if (index === 0) slide.classList.add('active');
+            slideshow.appendChild(slide);
+            slides.push(slide);
+        });
+
+        // Rotate slides
+        function nextSlide() {
+            slides[currentIndex].classList.remove('active');
+            currentIndex = (currentIndex + 1) % slides.length;
+            slides[currentIndex].classList.add('active');
+        }
+
+        setInterval(nextSlide, 6000); // Change image every 6 seconds
+
+        // Search functionality
+        const searchForm = document.getElementById('searchForm');
+        const searchInput = document.getElementById('searchInput');
+
+        searchForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const query = searchInput.value.trim();
+            if (query) {
+                // Open search in new tab
+                window.open(`https://google.co.uk/?q=${encodeURIComponent(query)}`, '_blank');
+                searchInput.value = '';
+            }
+        });
+    </script>
+</body>
+</html>
+

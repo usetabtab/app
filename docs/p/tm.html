@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New Tab Page</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap">
+    <style>
+        /* Basic CSS Reset */
+        body, h1, p {
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif; /* Use Inter font */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background-color: #f7f7f7;
+            color: #2c3e50;
+            transition: background-color 0.3s, color 0.3s;
+            overflow: hidden; /* Prevent scrollbars */
+        }
+
+        /* Dark Mode Styles */
+        body.dark-mode {
+            background-color: #2c3e50;
+            color: #ecf0f1;
+        }
+
+        /* Fullscreen Background Image */
+        #background-image {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* Cover the entire screen */
+            z-index: -1; /* Place it behind other content */
+            transition: filter 0.3s; /* Smooth transition for the filter */
+        }
+
+        body.dark-mode #background-image {
+            filter: brightness(0.6); /* Dim the image in dark mode */
+        }
+
+        /* Time and Date Container */
+        #time-date-container {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            text-align: left;
+            color: white; /* Ensure text is visible on the background */
+            text-shadow: 0 0 5px rgba(0, 0, 0, 0.5); /* Add a text shadow for better readability */
+        }
+
+        #time {
+            font-size: 3em; /* Large time */
+            font-weight: 600; /* Bold weight */
+            line-height: 1; /* Adjust line height */
+        }
+
+        #date {
+            font-size: 1.2em; /* Smaller date */
+            font-weight: 400;
+        }
+
+        /* Icons Container */
+        #icons-container {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            display: flex;
+            align-items: center;
+        }
+
+        /* Image Upload Styling */
+        #image-upload-container {
+            position: relative;
+            margin-right: 15px; /* Space between the icons */
+            width: 60px; /* Increased width */
+            height: 60px; /* Increased height, equal to the width for 1:1 ratio */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #image-upload {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        #upload-icon {
+            font-size: 2em;
+            color: #3498db;
+            transition: color 0.3s;
+            cursor: pointer;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.2); /* Add a semi-transparent background */
+            width: 100%; /* Ensure it fills the container */
+            height: 100%; /* Ensure it fills the container */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #upload-icon:hover {
+            color: #2980b9;
+        }
+
+        body.dark-mode #upload-icon {
+            color: #87CEEB;
+        }
+
+        body.dark-mode #upload-icon:hover {
+            color: #ADD8E6;
+        }
+
+        /* Theme Toggle Styling */
+        #theme-toggle {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 2em; /* Match icon size */
+            color: white; /* Always white */
+            transition: color 0.3s;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.2);
+            width: 60px; /* Increased width */
+            height: 60px; /* Increased height, equal to the width for 1:1 ratio */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Welcome Message Styling */
+        #welcome-message {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: white;
+            font-size: 2em;
+            text-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+            opacity: 1;
+            transition: opacity 0.5s;
+        }
+
+        #welcome-message.hidden {
+            opacity: 0;
+        }
+    </style>
+</head>
+<body>
+    <img id="background-image" src="" alt="Background Image" style="display: none;">
+
+    <div id="welcome-message">Welcome Thomas</div>
+
+    <div id="time-date-container">
+        <p id="time"></p>
+        <p id="date"></p>
+    </div>
+
+    <div id="icons-container">
+        <div id="image-upload-container">
+            <i id="upload-icon" class="fas fa-upload"></i>
+            <input type="file" id="image-upload" accept="image/*">
+        </div>
+
+        <button id="theme-toggle">
+            <i id="theme-icon" class="fas fa-sun"></i> <!-- Default: Sun icon for light mode -->
+        </button>
+    </div>
+
+    <script>
+        // Time and Date Display
+        function updateTime() {
+            const now = new Date();
+            const dateOptions = { year: 'numeric', month: 'long', day: 'numeric' };
+            const timeOptions = { hour: '2-digit', minute: '2-digit', second: '2-digit' };
+
+            document.getElementById('time').textContent = now.toLocaleTimeString(undefined, timeOptions);
+            document.getElementById('date').textContent = now.toLocaleDateString(undefined, dateOptions);
+        }
+
+        setInterval(updateTime, 1000);
+        updateTime(); // Initial call
+
+        // Image Upload as Background
+        const imageUpload = document.getElementById('image-upload');
+        const backgroundImage = document.getElementById('background-image');
+        const localStorageKey = 'backgroundImageDataURL'; // Key for local storage
+
+        // Function to load image from local storage
+        function loadImageFromLocalStorage() {
+            const storedImage = localStorage.getItem(localStorageKey);
+            if (storedImage) {
+                backgroundImage.setAttribute('src', storedImage);
+                backgroundImage.style.display = 'block';
+            }
+        }
+
+        // Load image on page load
+        loadImageFromLocalStorage();
+
+        imageUpload.addEventListener('change', function() {
+            const file = this.files[0];
+
+            if (file) {
+                const reader = new FileReader();
+
+                reader.addEventListener('load', function() {
+                    const imageDataURL = this.result;
+                    backgroundImage.setAttribute('src', imageDataURL);
+                    backgroundImage.style.display = 'block';
+
+                    // Store the image in local storage
+                    localStorage.setItem(localStorageKey, imageDataURL);
+                });
+
+                reader.readAsDataURL(file);
+            } else {
+                backgroundImage.setAttribute('src', '');
+                backgroundImage.style.display = 'none';
+                localStorage.removeItem(localStorageKey); // Remove from local storage if no file
+            }
+        });
+
+        // Theme Toggle
+        const themeToggle = document.getElementById('theme-toggle');
+        const themeIcon = document.getElementById('theme-icon');
+        const body = document.body;
+
+        themeToggle.addEventListener('click', function() {
+            body.classList.toggle('dark-mode');
+
+            if (body.classList.contains('dark-mode')) {
+                themeIcon.classList.remove('fa-sun');
+                themeIcon.classList.add('fa-moon'); // Moon icon for dark mode
+            } else {
+                themeIcon.classList.remove('fa-moon');
+                themeIcon.classList.add('fa-sun'); // Sun icon for light mode
+            }
+
+            // Store the theme preference
+            localStorage.setItem('theme', body.classList.contains('dark-mode') ? 'dark' : 'light');
+        });
+
+        // Check for stored theme preference on page load
+        const storedTheme = localStorage.getItem('theme');
+        if (storedTheme === 'dark') {
+            body.classList.add('dark-mode');
+            themeIcon.classList.remove('fa-sun');
+            themeIcon.classList.add('fa-moon');
+        }
+
+        // Welcome Message
+        const welcomeMessage = document.getElementById('welcome-message');
+
+        setTimeout(() => {
+            welcomeMessage.classList.add('hidden');
+        }, 5000); // 5 seconds
+
+        // Offline Functionality (Service Worker) - unchanged
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/service-worker.js')
+                .then(registration => {
+                    console.log('Service Worker registered with scope:', registration.scope);
+                })
+                .catch(error => {
+                    console.error('Service Worker registration failed:', error);
+                });
+        }
+    </script>
+</body>
+</html>
