@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Minimal New Tab</title>
+  <!-- Font Awesome for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --bg-light: #f8f9fa;
+      --text-light: #212529;
+      --bg-dark: #121212;
+      --text-dark: #f8f9fa;
+    }
+    body {
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--bg-light);
+      color: var(--text-light);
+      font-family: 'Inter', 'Poppins', sans-serif;
+      transition: background 0.3s, color 0.3s;
+    }
+    body.dark {
+      background: var(--bg-dark);
+      color: var(--text-dark);
+    }
+    .container {
+      text-align: center;
+    }
+    .time-date {
+      margin-bottom: 2rem;
+    }
+    #time {
+      font-size: 4rem;
+      font-weight: 500;
+    }
+    #date {
+      font-size: 1.5rem;
+      opacity: 0.8;
+    }
+    #theme-toggle {
+      background: none;
+      border: none;
+      color: inherit;
+      cursor: pointer;
+      font-size: 2rem;
+      padding: 0.5rem;
+      border-radius: 50%;
+      transition: transform 0.2s;
+      width: 50px;
+      height: 50px;
+      postition: absolute;
+      bottom: 10px;
+      right: 10px;
+    }
+    #theme-toggle:hover {
+      transform: scale(1.15);
+    }
+  </style>
+</head>
+<body class="light">
+  <div class="container">
+    <div class="time-date">
+      <div id="time"></div>
+      <div id="date"></div>
+    </div>
+    <button id="theme-toggle" aria-label="Toggle theme">
+      <i class="fas fa-moon"></i>
+    </button>
+  </div>
+  <script>
+    function updateTime() {
+      const now = new Date();
+      document.getElementById('time').textContent = now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+      document.getElementById('date').textContent = now.toLocaleDateString([], {weekday: 'long', month: 'short', day: 'numeric'});
+    }
+    function toggleTheme() {
+      const body = document.body;
+      const icon = document.querySelector('#theme-toggle i');
+      if (body.classList.contains('light')) {
+        body.classList.remove('light');
+        body.classList.add('dark');
+        icon.classList.remove('fa-moon');
+        icon.classList.add('fa-sun');
+      } else {
+        body.classList.remove('dark');
+        body.classList.add('light');
+        icon.classList.remove('fa-sun');
+        icon.classList.add('fa-moon');
+      }
+    }
+    updateTime();
+    setInterval(updateTime, 1000);
+    document.getElementById('theme-toggle').addEventListener('click', toggleTheme);
+  </script>
+</body>
+</html>

@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New Tab</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+        :root {
+            --text-color: #333;
+            --light-bg-color: rgba(255, 255, 255, 0.85); /* Slightly opaque white */
+            --button-bg-color: #007bff;
+            --button-hover-color: #0056b3;
+            --clear-button-color: #dc3545;
+            --clear-button-hover-color: #c82333;
+            --shadow-light: 0 4px 15px rgba(0, 0, 0, 0.1);
+            --shadow-medium: 0 6px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        body {
+            margin: 0;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: var(--text-color);
+            font-family: 'Poppins', sans-serif;
+            background-color: #f0f2f5; /* Very light grey default background */
+            background-size: cover;
+            background-position: center center;
+            background-repeat: no-repeat;
+            transition: background-image 0.5s ease-in-out, background-color 0.5s ease-in-out;
+        }
+
+        body.dark-text {
+            color: var(--text-color); /* For light backgrounds */
+        }
+
+        body.light-text {
+            color: white; /* For dark backgrounds */
+        }
+
+        #time-container {
+            text-align: center;
+            background-color: var(--light-bg-color);
+            padding: 40px 60px;
+            border-radius: 15px;
+            box-shadow: var(--shadow-medium);
+            backdrop-filter: blur(8px); /* Frosted glass effect */
+            -webkit-backdrop-filter: blur(8px); /* For Safari */
+            transition: background-color 0.3s ease-in-out;
+        }
+
+        #time {
+            font-size: 7em;
+            font-weight: 600;
+            margin-bottom: 5px;
+            letter-spacing: -2px;
+        }
+
+        #date {
+            font-size: 2.2em;
+            font-weight: 300;
+            text-transform: capitalize;
+        }
+
+        #upload-section {
+            position: absolute;
+            bottom: 25px;
+            right: 25px;
+            background-color: var(--light-bg-color);
+            padding: 12px 20px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            box-shadow: var(--shadow-light);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            transition: background-color 0.3s ease-in-out;
+        }
+
+        /* Styling for the icon buttons */
+        #upload-section label,
+        #clearImage {
+            cursor: pointer;
+            background-color: var(--button-bg-color);
+            color: white;
+            width: 40px; /* Fixed width for icon buttons */
+            height: 40px; /* Fixed height for icon buttons */
+            display: flex; /* Use flexbox to center icon */
+            justify-content: center; /* Center icon horizontally */
+            align-items: center; /* Center icon vertically */
+            border-radius: 8px;
+            border: none;
+            font-size: 1.2em; /* Icon size */
+            transition: background-color 0.2s ease, transform 0.1s ease;
+        }
+
+        #upload-section label:hover {
+            background-color: var(--button-hover-color);
+            transform: translateY(-1px);
+        }
+
+        #bgFileInput {
+            display: none; /* Hide the actual file input */
+        }
+
+        #clearImage {
+            background-color: var(--clear-button-color);
+        }
+
+        #clearImage:hover {
+            background-color: var(--clear-button-hover-color);
+            transform: translateY(-1px);
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 992px) {
+            #time {
+                font-size: 5.5em;
+            }
+            #date {
+                font-size: 1.8em;
+            }
+            #time-container {
+                padding: 30px 45px;
+            }
+            #upload-section {
+                bottom: 20px;
+                right: 20px;
+                padding: 10px 18px;
+                gap: 10px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            #time {
+                font-size: 4em;
+            }
+            #date {
+                font-size: 1.5em;
+            }
+            #time-container {
+                padding: 25px 35px;
+            }
+            #upload-section {
+                flex-direction: row; /* Keep as row on smaller screens for horizontal buttons */
+                right: auto;
+                left: 50%;
+                transform: translateX(-50%);
+                bottom: 15px;
+                padding: 10px 15px;
+                width: auto; /* Allow width to be determined by content */
+                max-width: unset;
+                gap: 10px; /* Adjust gap */
+            }
+        }
+
+        @media (max-width: 480px) {
+            #time {
+                font-size: 3em;
+            }
+            #date {
+                font-size: 1.2em;
+            }
+            #time-container {
+                padding: 20px 30px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="time-container">
+        <div id="time"></div>
+        <div id="date"></div>
+    </div>
+
+    <div id="upload-section">
+        <input type="file" id="bgFileInput" accept="image/*">
+        <label for="bgFileInput" title="Upload Background">
+            <i class="fas fa-cloud-arrow-up"></i>
+        </label>
+        <button id="clearImage" title="Clear Background">
+            <i class="fas fa-trash-can"></i>
+        </button>
+    </div>
+
+    <script>
+        const timeElement = document.getElementById('time');
+        const dateElement = document.getElementById('date');
+        const body = document.body;
+        const bgFileInput = document.getElementById('bgFileInput');
+        const clearImageButton = document.getElementById('clearImage');
+        const timeContainer = document.getElementById('time-container');
+        const uploadSection = document.getElementById('upload-section');
+
+        function updateTimeAndDate() {
+            const now = new Date();
+            const timeOptions = { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false };
+            const dateOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+
+            const timeString = now.toLocaleTimeString('en-US', timeOptions);
+            const dateString = now.toLocaleDateString('en-US', dateOptions);
+
+            timeElement.textContent = timeString;
+            dateElement.textContent = dateString;
+        }
+
+        function loadBackgroundImage() {
+            const savedImage = localStorage.getItem('backgroundImage');
+            if (savedImage) {
+                body.style.backgroundImage = `url(${savedImage})`;
+                body.style.backgroundColor = 'transparent';
+                const img = new Image();
+                img.onload = function() {
+                    const isDark = isImageDark(img);
+                    if (isDark) {
+                        body.classList.remove('dark-text');
+                        body.classList.add('light-text');
+                        timeContainer.style.backgroundColor = 'rgba(0, 0, 0, 0.6)';
+                        uploadSection.style.backgroundColor = 'rgba(0, 0, 0, 0.6)';
+                        document.documentElement.style.setProperty('--button-bg-color', '#4CAF50'); /* Green */
+                        document.documentElement.style.setProperty('--button-hover-color', '#45a049');
+                        document.documentElement.style.setProperty('--clear-button-color', '#FF5722'); /* Orange */
+                        document.documentElement.style.setProperty('--clear-button-hover-color', '#E64A19');
+                    } else {
+                        body.classList.remove('light-text');
+                        body.classList.add('dark-text');
+                        timeContainer.style.backgroundColor = 'var(--light-bg-color)';
+                        uploadSection.style.backgroundColor = 'var(--light-bg-color)';
+                        document.documentElement.style.setProperty('--button-bg-color', '#007bff');
+                        document.documentElement.style.setProperty('--button-hover-color', '#0056b3');
+                        document.documentElement.style.setProperty('--clear-button-color', '#dc3545');
+                        document.documentElement.style.setProperty('--clear-button-hover-color', '#c82333');
+                    }
+                };
+                img.onerror = function() {
+                    console.error("Error loading image from local storage. Clearing it.");
+                    clearImage(); // Clear image if it fails to load
+                };
+                img.src = savedImage;
+            } else {
+                clearImageStyles(); // Apply default styles
+            }
+        }
+
+        function clearImage() {
+            localStorage.removeItem('backgroundImage');
+            bgFileInput.value = '';
+            clearImageStyles();
+        }
+
+        function clearImageStyles() {
+            body.style.backgroundImage = 'none';
+            body.style.backgroundColor = '#f0f2f5';
+            body.classList.remove('light-text');
+            body.classList.add('dark-text');
+            timeContainer.style.backgroundColor = 'var(--light-bg-color)';
+            uploadSection.style.backgroundColor = 'var(--light-bg-color)';
+            document.documentElement.style.setProperty('--button-bg-color', '#007bff');
+            document.documentElement.style.setProperty('--button-hover-color', '#0056b3');
+            document.documentElement.style.setProperty('--clear-button-color', '#dc3545');
+            document.documentElement.style.setProperty('--clear-button-hover-color', '#c82333');
+        }
+
+
+        function isImageDark(img) {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = img.width;
+            canvas.height = img.height;
+            ctx.drawImage(img, 0, 0);
+
+            let sumBrightness = 0;
+            let count = 0;
+            const sampleSize = 100;
+            const stepX = Math.max(1, Math.floor(img.width / Math.sqrt(sampleSize)));
+            const stepY = Math.max(1, Math.floor(img.height / Math.sqrt(sampleSize)));
+
+            for (let y = 0; y < img.height; y += stepY) {
+                for (let x = 0; x < img.width; x += stepX) {
+                    try {
+                        const pixelData = ctx.getImageData(x, y, 1, 1).data;
+                        const r = pixelData[0];
+                        const g = pixelData[1];
+                        const b = pixelData[2];
+                        const luminance = (0.299 * r + 0.587 * g + 0.114 * b);
+                        sumBrightness += luminance;
+                        count++;
+                    } catch (e) {
+                        console.warn("Could not read image data for brightness check. Image might be from a different origin.", e);
+                        return false;
+                    }
+                }
+            }
+            if (count === 0) return false;
+
+            const averageBrightness = sumBrightness / count;
+            return averageBrightness < 128;
+        }
+
+
+        bgFileInput.addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const imageUrl = e.target.result;
+                    body.style.backgroundImage = `url(${imageUrl})`;
+                    localStorage.setItem('backgroundImage', imageUrl);
+                    loadBackgroundImage(); // Re-evaluate text color and button styles
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        clearImageButton.addEventListener('click', clearImage);
+
+        // Initial calls
+        updateTimeAndDate();
+        loadBackgroundImage();
+
+        setInterval(updateTimeAndDate, 1000);
+    </script>
+</body>
+</html>

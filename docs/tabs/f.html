@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New Tab</title>
+    <style>
+        /* Base Styles */
+        body {
+            font-family: 'Inter', 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            transition: background-color 0.4s ease, color 0.4s ease;
+            background-color: #f7f9fc; /* Very light blue-gray */
+            color: #333;
+            overflow: hidden; /* Prevent scrollbar from modal transition */
+        }
+
+        /* Dark Mode Styles */
+        body.dark-mode {
+            background-color: #2b2e35; /* Darker charcoal */
+            color: #e0e2e5;
+        }
+
+        /* Container for main content */
+        .container {
+            text-align: center;
+            padding: 40px;
+            border-radius: 16px;
+            background-color: #ffffff;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08); /* Softer, larger shadow */
+            transition: background-color 0.4s ease, box-shadow 0.4s ease;
+            width: 90%;
+            max-width: 750px; /* Slightly wider */
+        }
+
+        .dark-mode .container {
+            background-color: #3f444d; /* Dark container */
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Header (Time, Date, Theme Toggle) */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start; /* Align items to top */
+            margin-bottom: 50px;
+            position: relative; /* For theme toggle positioning if needed */
+        }
+
+        .datetime {
+            text-align: left;
+        }
+
+        .time {
+            font-size: 4.5em; /* Larger time */
+            font-weight: 700; /* Bolder */
+            line-height: 1;
+            margin-bottom: 5px;
+        }
+
+        .date {
+            font-size: 1.3em;
+            color: #6a737d; /* Softer gray */
+        }
+
+        .dark-mode .date {
+            color: #aeb4bc; /* Lighter gray for dark mode */
+        }
+
+        .theme-toggle {
+            background: none;
+            border: none;
+            font-size: 2.2em; /* Larger icon */
+            cursor: pointer;
+            color: #6a737d; /* Consistent icon color */
+            transition: transform 0.2s ease, color 0.2s ease;
+            padding: 5px; /* Make clickable area a bit larger */
+        }
+
+        .dark-mode .theme-toggle {
+            color: #aeb4bc;
+        }
+
+        .theme-toggle:hover {
+            transform: scale(1.15);
+            color: #333; /* Darken on hover */
+        }
+
+        .dark-mode .theme-toggle:hover {
+            color: #fff; /* Lighten on hover in dark mode */
+        }
+
+        /* Quick Links Section */
+        .quick-links-section {
+            margin-top: 30px;
+        }
+
+        .quick-links-section h2 {
+            font-size: 1.9em;
+            margin-bottom: 25px;
+            color: #4a5568; /* Slightly darker heading */
+        }
+
+        .dark-mode .quick-links-section h2 {
+            color: #cbd5e0;
+        }
+
+        .add-link-button-wrapper {
+            margin-bottom: 30px;
+        }
+
+        .add-link-button {
+            background-color: #4CAF50; /* Green plus button */
+            color: white;
+            border: none;
+            border-radius: 50%; /* Circular button */
+            width: 60px; /* Size of button */
+            height: 60px;
+            font-size: 3em; /* Plus icon size */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+            transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+            margin: 0 auto; /* Center the button */
+        }
+
+        .add-link-button:hover {
+            background-color: #45a049;
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
+        }
+
+        .dark-mode .add-link-button {
+            background-color: #66bb6a;
+            box-shadow: 0 4px 15px rgba(102, 187, 106, 0.3);
+        }
+
+        .dark-mode .add-link-button:hover {
+            background-color: #81c784;
+            box-shadow: 0 6px 20px rgba(102, 187, 106, 0.4);
+        }
+
+
+        /* Quick Links Display Area */
+        .quick-links {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+            min-height: 80px; /* Ensure space even if no links */
+            align-items: center; /* Vertically center "No links" text */
+        }
+
+        .quick-link-item {
+            background-color: #eef2f6; /* Lighter background for links */
+            padding: 12px 18px; /* More padding */
+            border-radius: 10px; /* Slightly more rounded */
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.2s ease;
+            text-decoration: none;
+            color: #333;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            min-width: 140px;
+            max-width: 180px; /* Set a max-width to control link size */
+            justify-content: space-between;
+        }
+
+        .dark-mode .quick-link-item {
+            background-color: #4a5059;
+            color: #e0e2e5;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .quick-link-item:hover {
+            background-color: #e0e6ed;
+            transform: translateY(-4px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .dark-mode .quick-link-item:hover {
+            background-color: #5a6069;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .quick-link-item a {
+            text-decoration: none;
+            color: inherit;
+            font-weight: 600; /* Bolder text */
+            flex-grow: 1;
+            text-align: left;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            padding-right: 5px; /* Give some space before delete button */
+        }
+
+        .delete-link-btn {
+            background: none;
+            border: none;
+            color: #ff6b6b; /* Soft red for delete */
+            cursor: pointer;
+            font-size: 1.5em; /* Larger delete icon */
+            line-height: 1;
+            opacity: 0.8;
+            transition: opacity 0.2s ease, transform 0.2s ease;
+        }
+
+        .dark-mode .delete-link-btn {
+            color: #ff9a9a;
+        }
+
+        .delete-link-btn:hover {
+            opacity: 1;
+            transform: scale(1.1);
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none; /* Hidden by default */
+            position: fixed; /* Stay in place */
+            z-index: 10; /* Sit on top */
+            left: 0;
+            top: 0;
+            width: 100%; /* Full width */
+            height: 100%; /* Full height */
+            overflow: auto; /* Enable scroll if needed */
+            background-color: rgba(0, 0, 0, 0.4); /* Black w/ opacity */
+            backdrop-filter: blur(5px); /* Frosted glass effect */
+            -webkit-backdrop-filter: blur(5px); /* For Safari */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        .modal.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content {
+            background-color: #ffffff; /* Very clean white */
+            margin: auto;
+            padding: 35px; /* Slightly more padding */
+            border-radius: 16px; /* More rounded */
+            width: 90%;
+            max-width: 480px; /* Slightly wider modal */
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15); /* Modern, soft shadow */
+            position: relative;
+            transform: translateY(-20px);
+            transition: transform 0.3s ease, background-color 0.3s ease, box-shadow 0.3s ease;
+            border: 1px solid rgba(0, 0, 0, 0.05); /* Subtle border for definition */
+        }
+
+        .modal.active .modal-content {
+            transform: translateY(0);
+        }
+
+        .dark-mode .modal-content {
+            background-color: #3f444d;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .close-button {
+            color: #999; /* Softer close button color */
+            font-size: 2.5em; /* Larger close button */
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            cursor: pointer;
+            transition: color 0.2s ease, transform 0.2s ease;
+        }
+
+        .close-button:hover,
+        .close-button:focus {
+            color: #333;
+            transform: rotate(90deg); /* Little spin on close */
+        }
+
+        .dark-mode .close-button {
+            color: #ccc;
+        }
+        .dark-mode .close-button:hover,
+        .dark-mode .close-button:focus {
+            color: #eee;
+        }
+
+
+        .modal h3 {
+            margin-top: 0;
+            margin-bottom: 30px; /* More space below heading */
+            font-size: 2em; /* Larger heading */
+            color: #333;
+            font-weight: 600; /* Semi-bold */
+        }
+
+        .dark-mode .modal h3 {
+            color: #e0e2e5;
+        }
+
+        .modal .link-input-group {
+            flex-direction: column;
+            gap: 20px; /* More space between inputs */
+            margin-bottom: 0;
+        }
+
+        .modal .link-input-group input {
+            width: calc(100% - 28px); /* Full width minus padding and border */
+            padding: 14px; /* More padding */
+            border: 1px solid #e0e6ed; /* Lighter border */
+            border-radius: 8px; /* Slightly more rounded */
+            font-size: 1.1em; /* Larger font in inputs */
+            background-color: #f9fbfd; /* Very light input background */
+            color: #333;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
+        }
+
+        .dark-mode .modal .link-input-group input {
+            background-color: #31353c;
+            border-color: #444850;
+            color: #e0e2e5;
+        }
+
+        .modal .link-input-group input:focus {
+            outline: none;
+            border-color: #6a8ce3;
+            box-shadow: 0 0 0 4px rgba(106, 140, 227, 0.2); /* Softer, wider glow */
+            background-color: #ffffff; /* White background on focus */
+        }
+
+        .dark-mode .modal .link-input-group input:focus {
+            border-color: #79a5f5;
+            box-shadow: 0 0 0 4px rgba(121, 165, 245, 0.2);
+            background-color: #3a4049;
+        }
+
+        .modal .link-input-group button {
+            width: 100%;
+            margin-top: 25px; /* More space above button */
+            padding: 15px 25px; /* Larger button padding */
+            font-size: 1.15em; /* Larger font in button */
+            font-weight: 600;
+            color: white;
+            border: none;
+            border-radius: 10px; /* More rounded button */
+            cursor: pointer;
+            background: linear-gradient(to right, #6a8ce3, #5a7dcb); /* Modern gradient */
+            box-shadow: 0 5px 15px rgba(90, 125, 203, 0.3); /* Soft shadow */
+            transition: background 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+        }
+
+        .modal .link-input-group button:hover {
+            background: linear-gradient(to right, #5a7dcb, #4a6bae);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(90, 125, 203, 0.4);
+        }
+
+        .dark-mode .modal .link-input-group button {
+            background: linear-gradient(to right, #79a5f5, #6cb6ff);
+            box-shadow: 0 5px 15px rgba(108, 182, 255, 0.3);
+        }
+
+        .dark-mode .modal .link-input-group button:hover {
+            background: linear-gradient(to right, #6cb6ff, #5aa0e6);
+            box-shadow: 0 8px 20px rgba(108, 182, 255, 0.4);
+        }
+
+
+        /* Responsive Adjustments */
+        @media (max-width: 650px) {
+            .time {
+                font-size: 3.5em;
+            }
+
+            .date {
+                font-size: 1.1em;
+            }
+
+            .header {
+                flex-direction: column;
+                align-items: center;
+                gap: 20px;
+            }
+            .datetime {
+                text-align: center; /* Center time/date on small screens */
+            }
+
+            .theme-toggle {
+                position: static; /* Remove absolute positioning on small screens */
+            }
+
+            .quick-links-section h2 {
+                font-size: 1.6em;
+            }
+
+            .add-link-button {
+                width: 50px;
+                height: 50px;
+                font-size: 2.5em;
+            }
+
+            .quick-link-item {
+                flex-basis: 45%; /* Two items per row on smaller screens */
+                min-width: unset;
+                max-width: unset;
+                padding: 10px 15px;
+            }
+
+            .modal-content {
+                padding: 25px; /* Less padding in modal on small screens */
+            }
+            .modal h3 {
+                font-size: 1.6em;
+                margin-bottom: 20px;
+            }
+            .modal .link-input-group input {
+                font-size: 1em;
+                padding: 12px;
+            }
+            .modal .link-input-group button {
+                font-size: 1.05em;
+                padding: 12px 20px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 25px;
+            }
+            .time {
+                font-size: 2.8em;
+            }
+            .date {
+                font-size: 0.95em;
+            }
+            .quick-link-item {
+                flex-basis: 90%; /* One item per row on very small screens */
+            }
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="datetime">
+                <div id="time" class="time"></div>
+                <div id="date" class="date"></div>
+            </div>
+            <button id="theme-toggle" class="theme-toggle" aria-label="Toggle light and dark mode">🌙</button>
+        </div>
+
+        <div class="quick-links-section">
+            <h2>Quick Links</h2>
+            <div class="add-link-button-wrapper">
+                <button id="show-add-link-modal" class="add-link-button" aria-label="Add new quick link">＋</button>
+            </div>
+            <div id="quick-links" class="quick-links">
+                </div>
+        </div>
+    </div>
+
+    <div id="addLinkModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" aria-label="Close modal">×</span>
+            <h3>Add New Quick Link</h3>
+            <div class="link-input-group">
+                <input type="text" id="modal-link-name" placeholder="Link Name (e.g., Google, YouTube)" aria-label="Link Name"><br><br>
+                <input type="url" id="modal-link-url" placeholder="URL (e.g., google.com, youtube.com)" aria-label="Link URL">
+                <button id="modal-add-link">Add Link</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const timeElement = document.getElementById('time');
+        const dateElement = document.getElementById('date');
+        const themeToggle = document.getElementById('theme-toggle');
+        const quickLinksContainer = document.getElementById('quick-links');
+        const showAddLinkModalButton = document.getElementById('show-add-link-modal');
+
+        // Modal elements
+        const addLinkModal = document.getElementById('addLinkModal');
+        const closeButton = document.querySelector('.close-button');
+        const modalLinkNameInput = document.getElementById('modal-link-name');
+        const modalLinkUrlInput = document.getElementById('modal-link-url');
+        const modalAddLinkButton = document.getElementById('modal-add-link');
+
+        // --- Time and Date Functions ---
+        function updateDateTime() {
+            const now = new Date();
+            // Format time (e.g., 09:15 AM)
+            timeElement.textContent = now.toLocaleTimeString('en-US', {
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: true
+            });
+
+            // Format date (e.g., Tuesday, June 10, 2025)
+            dateElement.textContent = now.toLocaleDateString('en-US', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+        }
+
+        // Update every second
+        setInterval(updateDateTime, 1000);
+        updateDateTime(); // Initial call to display immediately
+
+        // --- Theme Toggle Functions ---
+        function applyTheme(theme) {
+            document.body.classList.toggle('dark-mode', theme === 'dark');
+            themeToggle.textContent = theme === 'dark' ? '☀️' : '🌙'; // Sun for dark, Moon for light
+        }
+
+        function toggleTheme() {
+            const currentTheme = document.body.classList.contains('dark-mode') ? 'dark' : 'light';
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            localStorage.setItem('theme', newTheme);
+            applyTheme(newTheme);
+        }
+
+        // Load theme from local storage on page load
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        applyTheme(savedTheme);
+        themeToggle.addEventListener('click', toggleTheme);
+
+        // --- Quick Links Functions ---
+        function getLinks() {
+            const links = localStorage.getItem('quickLinks');
+            return links ? JSON.parse(links) : [];
+        }
+
+        function saveLinks(links) {
+            localStorage.setItem('quickLinks', JSON.stringify(links));
+        }
+
+        function renderLinks() {
+            quickLinksContainer.innerHTML = ''; // Clear existing links
+            const links = getLinks();
+
+            if (links.length === 0) {
+                const noLinksMessage = document.createElement('p');
+                noLinksMessage.style.color = '#888';
+                noLinksMessage.style.fontSize = '0.95em';
+                noLinksMessage.textContent = 'Click the \'＋\' button to add your first quick link.';
+                if (document.body.classList.contains('dark-mode')) {
+                     noLinksMessage.style.color = '#aaa';
+                }
+                quickLinksContainer.appendChild(noLinksMessage);
+            } else {
+                links.forEach((link, index) => {
+                    const linkItem = document.createElement('div');
+                    linkItem.className = 'quick-link-item';
+
+                    const anchor = document.createElement('a');
+                    anchor.href = link.url;
+                    anchor.textContent = link.name;
+                    anchor.target = '_blank'; // Open in new tab
+                    anchor.rel = 'noopener noreferrer'; // Security best practice
+
+                    const deleteButton = document.createElement('button');
+                    deleteButton.className = 'delete-link-btn';
+                    deleteButton.innerHTML = '×'; // '×' symbol
+                    deleteButton.ariaLabel = `Delete ${link.name}`; // Accessibility
+                    deleteButton.onclick = (event) => {
+                        event.stopPropagation(); // Prevent link click when deleting
+                        deleteLink(index);
+                    };
+
+                    linkItem.appendChild(anchor);
+                    linkItem.appendChild(deleteButton);
+                    quickLinksContainer.appendChild(linkItem);
+                });
+            }
+        }
+
+        function addLink() {
+            const name = modalLinkNameInput.value.trim();
+            let url = modalLinkUrlInput.value.trim();
+
+            if (name && url) {
+                // Prepend 'https://' if no protocol is present
+                // Check if it already has a protocol like http://, https://, ftp://, file://, mailto:, tel:
+                if (!url.match(/^[a-zA-Z]+:\/\//i)) {
+                    url = 'https://' + url;
+                }
+
+                const links = getLinks();
+                links.push({ name, url });
+                saveLinks(links);
+                renderLinks();
+                closeModal(); // Close modal after adding
+                modalLinkNameInput.value = '';
+                modalLinkUrlInput.value = '';
+            } else {
+                alert('Please enter both a link name and a URL.');
+            }
+        }
+
+        function deleteLink(index) {
+            const links = getLinks();
+            links.splice(index, 1); // Remove link at specified index
+            saveLinks(links);
+            renderLinks();
+        }
+
+        // --- Modal Functions ---
+        function openModal() {
+            addLinkModal.classList.add('active');
+            modalLinkNameInput.focus(); // Focus on first input when modal opens
+        }
+
+        function closeModal() {
+            addLinkModal.classList.remove('active');
+            // Clear inputs when closing for next time
+            modalLinkNameInput.value = '';
+            modalLinkUrlInput.value = '';
+        }
+
+        // Event Listeners
+        showAddLinkModalButton.addEventListener('click', openModal);
+        closeButton.addEventListener('click', closeModal);
+        modalAddLinkButton.addEventListener('click', addLink);
+
+        // Close modal if user clicks outside of it
+        window.addEventListener('click', (event) => {
+            if (event.target === addLinkModal) {
+                closeModal();
+            }
+        });
+
+        // Close modal with Escape key
+        window.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape' && addLinkModal.classList.contains('active')) {
+                closeModal();
+            }
+        });
+
+        // Allow adding link with Enter key in modal input fields
+        modalLinkNameInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') modalAddLinkButton.click();
+        });
+        modalLinkUrlInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') modalAddLinkButton.click();
+        });
+
+
+        // Initial render of links on page load
+        renderLinks();
+    </script>
+</body>
+</html>

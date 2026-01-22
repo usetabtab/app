@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New Tab</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        /* Custom styles for theme transitions and font */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color); /* Base background color */
+            color: var(--text-color);
+            transition: background-color 0.3s ease, color 0.3s ease;
+            overflow: hidden; /* Prevent potential scrollbars from absolute positioning */
+            position: relative; /* Needed for ::before and overlay absolute positioning */
+
+            /* Background image styles */
+            background-size: cover;
+            background-position: center center;
+            background-repeat: no-repeat;
+            /* Smooth transition for background image */
+            transition: background-image 1s ease-in-out;
+        }
+
+        /* Subtle animated grid background */
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2; /* Place behind image overlay */
+            opacity: var(--grid-opacity); /* Make lines very subtle */
+            background-size: 60px 60px; /* Size of the grid cells */
+            background-image:
+                linear-gradient(to right, var(--line-color) 1px, transparent 1px),
+                linear-gradient(to bottom, var(--line-color) 1px, transparent 1px);
+            animation: moveLines 60s linear infinite; /* Animate background position */
+        }
+
+        /* Keyframes for the background animation */
+        @keyframes moveLines {
+            from { background-position: 0 0; }
+            to { background-position: 60px 60px; } /* Moves by one grid cell size */
+        }
+
+        /* Light mode variables */
+        body.light {
+            --bg-color: #f0f2f5; /* Fallback/base light grey */
+            --text-color: #333;  /* Dark grey for text */
+            --icon-color: #555;  /* Darker grey for icon */
+            --icon-hover: #000;  /* Black on hover */
+            --icon-bg-hover: rgba(0, 0, 0, 0.05); /* Light hover background */
+            --line-color: rgba(0, 0, 0, 0.1); /* Light grey lines for grid */
+            --overlay-color: rgba(255, 255, 255, 0.4); /* Light overlay with transparency */
+            --grid-opacity: 0.08; /* Opacity of the grid lines */
+        }
+
+        /* Dark mode variables */
+        body.dark {
+            --bg-color: #1a202c; /* Fallback/base dark charcoal */
+            --text-color: #e2e8f0; /* Light grey for text */
+            --icon-color: #cbd5e0; /* Lighter grey for icon */
+            --icon-hover: #fff;  /* White on hover */
+            --icon-bg-hover: rgba(255, 255, 255, 0.1); /* Dark hover background */
+            --line-color: rgba(255, 255, 255, 0.1); /* Light lines for dark grid */
+            --overlay-color: rgba(0, 0, 0, 0.4); /* Dark overlay with transparency */
+            --grid-opacity: 0.08; /* Opacity of the grid lines */
+        }
+
+        /* Image overlay to ensure text readability */
+        #image-overlay {
+            background-color: var(--overlay-color);
+            transition: background-color 0.3s ease;
+            z-index: -1; /* Place between background image and content */
+        }
+
+        /* Theme toggle icon styling */
+        .theme-toggle-icon {
+            fill: var(--icon-color);
+            transition: fill 0.3s ease;
+            padding: 0.75rem; /* Equivalent to p-3 */
+            border-radius: 9999px; /* Equivalent to rounded-full */
+            cursor: pointer;
+        }
+
+        .theme-toggle-icon:hover {
+            fill: var(--icon-hover);
+            background-color: var(--icon-bg-hover);
+        }
+
+        .theme-toggle-icon:active {
+            transform: scale(0.95); /* Slight press effect */
+        }
+    </style>
+</head>
+<body class="light">
+    <!-- Image overlay to provide contrast for text against background image -->
+    <div id="image-overlay" class="absolute inset-0"></div>
+
+    <div id="app" class="min-h-screen relative flex items-start justify-center p-8 z-0">
+        <!-- Clock and Date in Bottom Left -->
+        <div class="absolute bottom-8 left-8 text-left">
+            <div id="time" class="text-5xl md:text-7xl lg:text-8xl font-bold"></div>
+            <div id="date" class="text-lg md:text-xl lg:text-2xl mt-1 md:mt-2 opacity-80"></div>
+        </div>
+
+        <!-- Theme Toggle Icon in Bottom Right -->
+        <button id="themeToggle" class="absolute bottom-8 right-8 focus:outline-none">
+            <!-- Sun Icon (for light mode) -->
+            <svg id="sunIcon" class="theme-toggle-icon w-8 h-8 md:w-10 md:h-10" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: none;">
+                <circle cx="12" cy="12" r="5"></circle>
+                <line x1="12" y1="1" x2="12" y2="3"></line>
+                <line x1="12" y1="21" x2="12" y2="23"></line>
+                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                <line x1="1" y1="12" x2="3" y2="12"></line>
+                <line x1="21" y1="12" x2="23" y2="12"></line>
+                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+            </svg>
+            <!-- Moon Icon (for dark mode) -->
+            <svg id="moonIcon" class="theme-toggle-icon w-8 h-8 md:w-10 md:h-10" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+            </svg>
+        </button>
+    </div>
+
+    <script>
+        // Get references to DOM elements
+        const timeElement = document.getElementById('time');
+        const dateElement = document.getElementById('date');
+        const themeToggle = document.getElementById('themeToggle');
+        const sunIcon = document.getElementById('sunIcon');
+        const moonIcon = document.getElementById('moonIcon');
+        const body = document.body;
+        const imageOverlay = document.getElementById('image-overlay');
+
+        /**
+         * Updates the time and date displayed on the page.
+         * Formats the time as HH:MM:SS and the date as Month Day, Year.
+         */
+        function updateTime() {
+            const now = new Date();
+
+            // Format time (e.g., 14:35:01)
+            const timeOptions = { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false };
+            const currentTime = now.toLocaleTimeString('en-US', timeOptions);
+            timeElement.textContent = currentTime;
+
+            // Format date (e.g., Friday, June 07, 2024)
+            const dateOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            const currentDate = now.toLocaleDateString('en-US', dateOptions);
+            dateElement.textContent = currentDate;
+        }
+
+        /**
+         * Toggles between 'light' and 'dark' themes.
+         * Stores the chosen theme in localStorage for persistence.
+         * Also updates the visibility of the sun/moon icons.
+         */
+        function toggleTheme() {
+            const isDark = body.classList.contains('dark');
+
+            if (isDark) {
+                body.classList.remove('dark');
+                body.classList.add('light');
+                localStorage.setItem('theme', 'light');
+                sunIcon.style.display = 'block'; // Show sun icon for light mode
+                moonIcon.style.display = 'none'; // Hide moon icon
+            } else {
+                body.classList.remove('light');
+                body.classList.add('dark');
+                localStorage.setItem('theme', 'dark');
+                sunIcon.style.display = 'none'; // Hide sun icon
+                moonIcon.style.display = 'block'; // Show moon icon for dark mode
+            }
+        }
+
+        /**
+         * Changes the background image of the body to a new random image.
+         * Uses picsum.photos for random images.
+         */
+        function changeBackgroundImage() {
+            // Get a random image from picsum.photos
+            // Using Date.now() as a 'random' seed to ensure a new image each time.
+            const imageUrl = `https://picsum.photos/1920/1080?random=${Date.now()}`;
+
+            // Create a new Image object to preload the image
+            const img = new Image();
+            img.src = imageUrl;
+
+            img.onload = () => {
+                // Once the image is loaded, apply it to the body's background
+                body.style.backgroundImage = `url('${imageUrl}')`;
+            };
+
+            img.onerror = () => {
+                console.error('Failed to load background image:', imageUrl);
+                // Fallback to a solid background color defined by the theme if image fails
+                body.style.backgroundImage = 'none';
+            };
+        }
+
+        // Event listener for the theme toggle button (icon)
+        themeToggle.addEventListener('click', toggleTheme);
+
+        // Initial setup on page load
+        window.onload = function() {
+            const savedTheme = localStorage.getItem('theme');
+
+            if (savedTheme === 'dark') {
+                body.classList.add('dark');
+                sunIcon.style.display = 'none';
+                moonIcon.style.display = 'block';
+            } else {
+                // Default to light if no theme saved or if savedTheme is 'light'
+                body.classList.add('light');
+                sunIcon.style.display = 'block';
+                moonIcon.style.display = 'none';
+            }
+
+            // Update time immediately on load
+            updateTime();
+            // Set interval to update time every second
+            setInterval(updateTime, 1000);
+
+            // Change background image immediately on load
+            changeBackgroundImage();
+            // Set interval to change background image every 1 minute (60,000 milliseconds)
+            setInterval(changeBackgroundImage, 60 * 1000);
+        };
+    </script>
+</body>
+</html>

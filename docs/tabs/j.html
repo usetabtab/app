@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New Tab</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome CDN for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" xintegrity="sha512-Fo3rlroVzL7f2022+8+W14k7I+9e4b5tJ2P1fOQ01yq1j1+Q2w4f6+r5zC1C5V01234567890abcdefghijklmnopqrstuvwxyz" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+        /* Define Inter font */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            overflow: hidden; /* Hide scrollbars due to bouncing clock */
+            transition: background-color 0.3s ease, color 0.3s ease; /* Smooth transition for theme changes */
+        }
+
+        /* Light mode colors */
+        .light {
+            background-color: #f0f4f8; /* Light background */
+            color: #333; /* Dark text */
+        }
+
+        /* Dark mode colors */
+        .dark {
+            background-color: #1a202c; /* Dark background: A deep, muted blue-gray */
+            color: #e2e8f0; /* Light text */
+        }
+
+        /* Clock styling */
+        #bouncingClock {
+            position: absolute; /* Absolute positioning for bouncing */
+            font-size: clamp(2rem, 8vw, 6rem); /* Responsive font size */
+            font-weight: 600;
+            padding: 1.5rem 2.5rem;
+            background-color: rgba(255, 255, 255, 0.9); /* Slightly transparent white for light mode */
+            border-radius: 1.5rem;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
+            white-space: nowrap; /* Prevent time from wrapping */
+        }
+
+        .dark #bouncingClock {
+            background-color: rgba(0, 0, 0, 0.7); /* Slightly transparent black for dark mode */
+            color: #e2e8f0; /* Light text for dark mode clock */
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Theme toggle button styling */
+        #themeToggle {
+            position: absolute;
+            top: 1.5rem;
+            right: 1.5rem;
+            background-color: rgba(255, 255, 255, 0.8);
+            border: none;
+            border-radius: 9999px; /* Fully rounded */
+            padding: 0.75rem 1rem;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem; /* Icon size */
+            color: #4a5568; /* Icon color */
+        }
+
+        .dark #themeToggle {
+            background-color: rgba(0, 0, 0, 0.6);
+            color: #cbd5e0;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        #themeToggle:hover {
+            opacity: 0.9;
+        }
+    </style>
+</head>
+<body class="light flex items-center justify-center min-h-screen">
+
+    <!-- Bouncing Clock -->
+    <div id="bouncingClock">
+        <span id="hours">00</span>:<span id="minutes">00</span>:<span id="seconds">00</span>
+    </div>
+
+    <!-- Theme Toggle Button -->
+    <button id="themeToggle" aria-label="Toggle light and dark mode">
+        <i class="fas fa-moon"></i> <!-- Default to moon icon (dark mode) -->
+    </button>
+
+    <script>
+        // Get references to elements
+        const html = document.documentElement;
+        const bouncingClock = document.getElementById('bouncingClock');
+        const themeToggle = document.getElementById('themeToggle');
+        const hoursSpan = document.getElementById('hours');
+        const minutesSpan = document.getElementById('minutes');
+        const secondsSpan = document.getElementById('seconds');
+
+        // --- Theme Toggle Logic ---
+        // Check local storage for a saved theme preference
+        const currentTheme = localStorage.getItem('theme');
+        if (currentTheme) {
+            // If a theme is saved, apply it
+            html.classList.remove('light', 'dark'); // Remove existing theme classes
+            html.classList.add(currentTheme); // Add the saved theme class
+            updateThemeIcon(currentTheme); // Update the toggle icon
+        } else {
+            // Default to light mode if no preference saved
+            html.classList.add('light');
+            updateThemeIcon('light');
+        }
+
+        // Function to update the theme toggle icon based on the current theme
+        function updateThemeIcon(theme) {
+            if (theme === 'dark') {
+                themeToggle.innerHTML = '<i class="fas fa-sun"></i>'; // Show sun icon when in dark mode (click to go to light)
+            } else {
+                themeToggle.innerHTML = '<i class="fas fa-moon"></i>'; // Show moon icon when in light mode (click to go to dark)
+            }
+        }
+
+        // Add event listener for the theme toggle button
+        themeToggle.addEventListener('click', () => {
+            if (html.classList.contains('light')) {
+                // If currently in light mode, switch to dark
+                html.classList.remove('light');
+                html.classList.add('dark');
+                localStorage.setItem('theme', 'dark'); // Save preference
+                updateThemeIcon('dark');
+            } else {
+                // If currently in dark mode, switch to light
+                html.classList.remove('dark');
+                html.classList.add('light');
+                localStorage.setItem('theme', 'light'); // Save preference
+                updateThemeIcon('light');
+            }
+        });
+
+        // --- Bouncing Clock Logic ---
+        let posX = 50; // Initial X position (pixels) - will be updated based on window width
+        let posY = 50; // Initial Y position (pixels) - will be updated based on window height
+        let velX = 0.5; // Initial X velocity (pixels per frame)
+        let velY = 0.5; // Initial Y velocity (pixels per frame)
+
+        let clockWidth;
+        let clockHeight;
+        let windowWidth;
+        let windowHeight;
+
+        // Function to update dimensions (called on load and resize)
+        function updateDimensions() {
+            windowWidth = window.innerWidth;
+            windowHeight = window.innerHeight;
+            // Get the actual rendered dimensions of the clock element
+            const rect = bouncingClock.getBoundingClientRect();
+            clockWidth = rect.width;
+            clockHeight = rect.height;
+
+            // Adjust position if clock is outside bounds after resize to prevent it from getting stuck
+            if (posX + clockWidth > windowWidth) {
+                posX = windowWidth - clockWidth;
+            }
+            if (posY + clockHeight > windowHeight) {
+                posY = windowHeight - clockHeight;
+            }
+            if (posX < 0) posX = 0;
+            if (posY < 0) posY = 0;
+
+            // Apply initial position or correct position after resize
+            bouncingClock.style.left = `${posX}px`;
+            bouncingClock.style.top = `${posY}px`;
+        }
+
+        // Initialize dimensions when the window loads and update on resize
+        window.addEventListener('load', updateDimensions);
+        window.addEventListener('resize', updateDimensions);
+
+        // Update clock time every second
+        function updateClockTime() {
+            const now = new Date();
+            // Format hours, minutes, and seconds with leading zeros
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+
+            hoursSpan.textContent = hours;
+            minutesSpan.textContent = minutes;
+            secondsSpan.textContent = seconds;
+        }
+
+        // Initial time update call
+        updateClockTime();
+        // Set interval to update time every 1000 milliseconds (1 second)
+        setInterval(updateClockTime, 1000);
+
+        // Animation loop for the bouncing clock effect
+        function animateClock() {
+            // Update position based on velocity
+            posX += velX;
+            posY += velY;
+
+            // Check for collisions with horizontal walls (left/right)
+            if (posX + clockWidth > windowWidth || posX < 0) {
+                velX *= -1; // Reverse X velocity
+                // Clamp position to ensure it's exactly at the boundary, preventing overshooting
+                if (posX + clockWidth > windowWidth) posX = windowWidth - clockWidth;
+                if (posX < 0) posX = 0;
+            }
+            // Check for collisions with vertical walls (top/bottom)
+            if (posY + clockHeight > windowHeight || posY < 0) {
+                velY *= -1; // Reverse Y velocity
+                // Clamp position to ensure it's exactly at the boundary
+                if (posY + clockHeight > windowHeight) posY = windowHeight - clockHeight;
+                if (posY < 0) posY = 0;
+            }
+
+            // Apply the new calculated position to the clock element
+            bouncingClock.style.left = `${posX}px`;
+            bouncingClock.style.top = `${posY}px`;
+
+            // Request the next animation frame for a smooth loop
+            requestAnimationFrame(animateClock);
+        }
+
+        // Start the animation loop after the window and its content are fully loaded
+        window.onload = function() {
+            updateDimensions(); // Ensure dimensions are correctly set before the first animation frame
+            animateClock(); // Begin the bouncing animation
+        };
+
+    </script>
+</body>
+</html>

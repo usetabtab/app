@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New Tab</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Three.js CDN for 3D rendering -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <!-- Google Fonts - Inter for a modern, minimalistic font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;800&display=swap" rel="stylesheet">
+    <style>
+        /* Custom styles to ensure Inter font is applied and for minor adjustments */
+        body {
+            font-family: 'Inter', sans-serif; /* Now uses the loaded Inter font */
+            background-color: #0f172a; /* Dark blue-gray background for fallback/base */
+            color: #e2e8f0; /* Light gray text */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh; /* Full viewport height */
+            margin: 0;
+            overflow: hidden; /* Prevent scrolling */
+        }
+
+        /* Adjust placeholder color for better visibility on dark background */
+        input::placeholder {
+            color: #94a3b8; /* Slate 400 */
+            opacity: 1; /* Firefox default opacity can be lower */
+        }
+
+        /* Canvas for Three.js scene */
+        #three-canvas {
+            position: fixed; /* Fix canvas position relative to viewport */
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0; /* Send canvas to the background */
+            display: block; /* Ensure it takes up space */
+        }
+
+        /* Content wrapper to keep time, date, and search bar on top */
+        .content-wrapper {
+            position: relative; /* Establish a new stacking context */
+            z-index: 1; /* Keep content above the canvas */
+            pointer-events: none; /* Allow mouse events to pass through to canvas when content is not interactive */
+            width: 100%; /* Ensure it spans the width */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh; /* Make it cover the full height */
+            /* Added subtle text shadow for better contrast against dynamic background */
+            text-shadow: 0 0 10px rgba(0,0,0,0.5), 0 0 20px rgba(0,0,0,0.3);
+        }
+
+        /* Re-enable pointer events for interactive elements */
+        #search-input {
+            pointer-events: auto;
+        }
+    </style>
+</head>
+<body class="selection:bg-indigo-500 selection:text-white">
+    <!-- Three.js Canvas for 3D background -->
+    <canvas id="three-canvas"></canvas>
+
+    <!-- Main Content Wrapper -->
+    <div class="content-wrapper">
+        <!-- Time Display -->
+        <div id="time" class="text-6xl sm:text-7xl md:text-8xl font-extrabold mb-4 transition-all duration-300">
+            <!-- Time will be inserted here by JavaScript -->
+        </div>
+
+        <!-- Date Display -->
+        <div id="date" class="text-xl sm:text-2xl md:text-3xl font-medium text-slate-300 mb-8 transition-all duration-300">
+            <!-- Date will be inserted here by JavaScript -->
+        </div>
+
+        <!-- Search Bar -->
+        <div class="w-full flex justify-center">
+            <input
+                type="text"
+                id="search-input"
+                placeholder="Search Google..."
+                class="w-full max-w-xl p-4 md:p-5 text-lg rounded-full bg-slate-800 bg-opacity-70 border border-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-300 text-slate-100 shadow-xl backdrop-blur-sm"
+            />
+        </div>
+    </div>
+
+    <script>
+        /**
+         * @file New Tab Page JavaScript
+         * @description Handles time, date display, search functionality, and 3D minimalist plasma background animation.
+         */
+
+        // --- DOM Elements ---
+        const timeElement = document.getElementById('time');
+        const dateElement = document.getElementById('date');
+        const searchInput = document.getElementById('search-input');
+        const canvas = document.getElementById('three-canvas');
+
+        // --- Clock and Date Functionality ---
+
+        /**
+         * Updates the current time and date displayed on the page.
+         */
+        function updateClockAndDate() {
+            const now = new Date();
+
+            // Format time (e.g., 14:35 or 02:35 PM)
+            const optionsTime = {
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: false // Use 24-hour format for minimalism
+            };
+            const timeString = now.toLocaleTimeString('en-US', optionsTime);
+            timeElement.textContent = timeString;
+
+            // Format date (e.g., Wednesday, June 11, 2025)
+            const optionsDate = {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            };
+            const dateString = now.toLocaleDateString('en-US', optionsDate);
+            dateElement.textContent = dateString;
+        }
+
+        // Initialize the clock and date immediately
+        updateClockAndDate();
+
+        // Update the clock and date every second
+        setInterval(updateClockAndDate, 1000);
+
+        // --- Search Functionality ---
+
+        /**
+         * Handles the search functionality when the user presses Enter.
+         * Redirects to Google search results for the entered query.
+         * @param {KeyboardEvent} event - The keyboard event object.
+         */
+        function handleSearch(event) {
+            // Check if the pressed key is Enter (key code 13)
+            if (event.key === 'Enter') {
+                const query = searchInput.value.trim(); // Get search query and remove leading/trailing whitespace
+                if (query) {
+                    // Construct Google search URL
+                    const googleSearchUrl = `https://www.google.com/search?q=${encodeURIComponent(query)}`;
+                    // Navigate to the search results page
+                    window.location.href = googleSearchUrl;
+                }
+            }
+        }
+
+        // Add event listener for the search input
+        searchInput.addEventListener('keydown', handleSearch);
+
+        // --- Three.js Minimalist Plasma Background Functionality ---
+
+        let scene, camera, renderer, plasmaMesh, uniforms;
+        let mouseX = 0, mouseY = 0; // Mouse coordinates for camera rotation
+        let windowHalfX = window.innerWidth / 2;
+        let windowHalfY = window.innerHeight / 2;
+
+        /**
+         * Initializes the Three.js scene for the minimalist plasma effect.
+         */
+        function initThreeJS() {
+            // Scene setup
+            scene = new THREE.Scene();
+            scene.background = null; // Make background transparent to show CSS body background
+
+            // Camera setup: Use OrthographicCamera for a 2D look or PerspectiveCamera for subtle depth
+            // For a subtle shift and full-screen fill, PerspectiveCamera is still good, just positioned carefully.
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 100);
+            camera.position.z = 1; // Closer to the plane for a more 'fullscreen' feel
+
+            // Renderer setup
+            renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(window.devicePixelRatio); // Improve rendering quality on high-DPI screens
+
+            // Define custom uniforms for the shader
+            uniforms = {
+                time: { value: 0.0 },
+                resolution: { value: new THREE.Vector2(window.innerWidth, window.innerHeight) }
+            };
+
+            // Vertex Shader GLSL code (simplified for less displacement, more smooth)
+            const vertexShader = `
+                varying vec2 vUv;
+                void main() {
+                    vUv = uv;
+                    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+                }
+            `;
+
+            // Fragment Shader GLSL code (modern, minimalistic plasma colors and style)
+            const fragmentShader = `
+                uniform float time;
+                uniform vec2 resolution;
+                varying vec2 vUv;
+
+                // Function to create a smooth noise pattern
+                float noise(vec2 uv) {
+                    float t = time * 0.1; // Slower time for more subtle motion
+                    return sin(uv.x * 5.0 + t) +
+                           cos(uv.y * 5.0 + t * 0.7) +
+                           sin((uv.x + uv.y) * 4.0 + t * 0.5);
+                }
+
+                // Smoothstep function for smoother transitions
+                float smoothNoise(vec2 uv) {
+                    float n = noise(uv);
+                    return smoothstep(-1.5, 1.5, n); // Normalize and smooth the noise
+                }
+
+                void main() {
+                    vec2 aspectUv = vUv - 0.5;
+                    aspectUv.x *= resolution.x / resolution.y; // Correct aspect ratio for UVs
+
+                    // Plasma calculation - combine multiple noise functions for complex motion
+                    float p1 = smoothNoise(aspectUv * 1.5);
+                    float p2 = smoothNoise(aspectUv * 2.0 + vec2(time * 0.05));
+                    float p3 = smoothNoise(aspectUv * 3.0 + vec2(time * 0.08, time * 0.03));
+                    float p4 = smoothNoise(aspectUv * 0.8 + vec2(time * 0.02));
+
+                    float plasma = (p1 + p2 + p3 + p4) / 4.0; // Average them for a smoother field
+
+                    // Modern minimalistic color palette (cool blues and purples)
+                    vec3 colorA = vec3(0.08, 0.05, 0.2);   // Dark Indigo
+                    vec3 colorB = vec3(0.1, 0.2, 0.5);    // Muted Blue
+                    vec3 colorC = vec3(0.3, 0.4, 0.8);    // Soft Lavender Blue
+                    vec3 colorD = vec3(0.6, 0.7, 0.9);    // Very Light Blue/White hint
+
+                    // Blend colors based on the plasma value
+                    vec3 finalColor = mix(colorA, colorB, plasma * 1.5); // Increase intensity for more vibrant mid-range
+                    finalColor = mix(finalColor, colorC, max(0.0, plasma * 2.0 - 1.0)); // Introduce C later
+                    finalColor = mix(finalColor, colorD, max(0.0, plasma * 3.0 - 2.0)); // Introduce D last for highlights
+
+                    // Apply a subtle glowing effect to brighter areas
+                    finalColor += pow(plasma, 5.0) * vec3(0.3, 0.3, 0.4); // Add a subtle white/blue glow to highlights
+
+                    gl_FragColor = vec4(finalColor, 1.0);
+                }
+            `;
+
+            // Create a ShaderMaterial with our custom shaders and uniforms
+            const shaderMaterial = new THREE.ShaderMaterial({
+                uniforms: uniforms,
+                vertexShader: vertexShader,
+                fragmentShader: fragmentShader,
+                transparent: true, // Allow transparency to show the body background (if needed)
+                blending: THREE.AdditiveBlending // Good for glowing, blended effects
+            });
+
+            // Create a large plane geometry that fills the screen
+            const plasmaGeometry = new THREE.PlaneGeometry(100, 100, 1, 1); // Large plane, fewer segments as shader generates detail
+            plasmaMesh = new THREE.Mesh(plasmaGeometry, shaderMaterial);
+            scene.add(plasmaMesh);
+
+            // Add event listeners for mouse interaction and window resizing
+            document.addEventListener('mousemove', onDocumentMouseMove);
+            window.addEventListener('resize', onWindowResize);
+        }
+
+        /**
+         * Handles window resize events to update camera aspect ratio, renderer size, and shader resolution.
+         */
+        function onWindowResize() {
+            windowHalfX = window.innerWidth / 2;
+            windowHalfY = window.innerHeight / 2;
+
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            uniforms.resolution.value.set(window.innerWidth, window.innerHeight); // Update resolution uniform
+        }
+
+        /**
+         * Updates mouse coordinates for camera rotation based on mouse movement.
+         * @param {MouseEvent} event - The mouse event object.
+         */
+        function onDocumentMouseMove(event) {
+            mouseX = (event.clientX - windowHalfX) * 0.00005; // Very subtle sensitivity
+            mouseY = (event.clientY - windowHalfY) * 0.00005;
+        }
+
+        /**
+         * Animation loop: continuously updates shader uniforms and renders the scene.
+         */
+        function animate() {
+            requestAnimationFrame(animate); // Request the next frame
+
+            // Update the 'time' uniform, which drives the plasma animation in the shaders
+            uniforms.time.value = performance.now() * 0.001;
+
+            // Update camera position based on mouse input for a very subtle parallax effect
+            // The effect is now very minimal to keep the background from being distracting.
+            camera.position.x += (mouseX - camera.position.x) * .01;
+            camera.position.y += (-mouseY - camera.position.y) * .01;
+            camera.lookAt(scene.position); // Always look at the center of the scene
+
+            renderer.render(scene, camera); // Render the scene
+        }
+
+        // Start the Three.js animation on window load.
+        window.onload = function () {
+            initThreeJS();
+            animate();
+        };
+    </script>
+</body>
+</html>

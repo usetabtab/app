@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New Tab</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        :root {
+            --background-light: #f0f0f0;
+            --text-light: #333;
+            --background-dark: #1a1a1a;
+            --text-dark: #e0e0e0;
+            --accent-light: #007bff;
+            --accent-dark: #00bcd4;
+            --font-family-futuristic: 'Orbitron', sans-serif;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: var(--font-family-futuristic);
+            transition: background-color 0.5s ease, color 0.5s ease;
+            overflow: hidden; /* Prevent scrollbars */
+        }
+
+        body.light-mode {
+            background-color: var(--background-light);
+            color: var(--text-light);
+        }
+
+        body.dark-mode {
+            background-color: var(--background-dark);
+            color: var(--text-dark);
+        }
+
+        .clock-container {
+            text-align: center;
+            position: relative;
+        }
+
+        #time {
+            font-size: 8em; /* Extremely large for impact */
+            font-weight: 700;
+            letter-spacing: -2px;
+            margin-bottom: 10px;
+            text-shadow: 0 0 10px rgba(0, 255, 255, 0.3), 0 0 20px rgba(0, 255, 255, 0.2);
+        }
+
+        #date {
+            font-size: 2em;
+            font-weight: 400;
+            opacity: 0.8;
+        }
+
+        /* Theme Toggle Icon Styling */
+        #theme-toggle-icon {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 2.5em; /* Make the icon larger */
+            cursor: pointer;
+            transition: color 0.3s ease;
+            color: var(--text-dark); /* Default color for dark mode */
+        }
+
+        body.light-mode #theme-toggle-icon {
+            color: var(--text-light); /* Color for light mode */
+        }
+
+        /* Ensure the icon itself changes */
+        #theme-toggle-icon .fa-moon,
+        #theme-toggle-icon .fa-sun {
+            transition: opacity 0.3s ease;
+        }
+    </style>
+</head>
+<body class="dark-mode"> <div class="clock-container">
+        <div id="time"></div>
+        <div id="date"></div>
+    </div>
+
+    <div id="theme-toggle-icon">
+        <i class="fas fa-moon"></i> <i class="fas fa-sun" style="display: none;"></i> </div>
+
+    <script>
+        function updateTime() {
+            const now = new Date();
+            const timeOptions = { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false };
+            const dateOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+
+            document.getElementById('time').textContent = now.toLocaleTimeString('en-US', timeOptions);
+            document.getElementById('date').textContent = now.toLocaleDateString('en-US', dateOptions);
+        }
+
+        // Initial call and set interval for real-time update
+        updateTime();
+        setInterval(updateTime, 1000);
+
+        // Theme toggle functionality
+        const themeToggleIcon = document.getElementById('theme-toggle-icon');
+        const moonIcon = themeToggleIcon.querySelector('.fa-moon');
+        const sunIcon = themeToggleIcon.querySelector('.fa-sun');
+        const body = document.body;
+
+        // Set initial icon visibility based on default body class
+        if (body.classList.contains('dark-mode')) {
+            moonIcon.style.display = 'inline-block';
+            sunIcon.style.display = 'none';
+        } else {
+            moonIcon.style.display = 'none';
+            sunIcon.style.display = 'inline-block';
+        }
+
+
+        themeToggleIcon.addEventListener('click', () => {
+            body.classList.toggle('light-mode');
+            body.classList.toggle('dark-mode');
+
+            // Toggle icon visibility
+            if (body.classList.contains('dark-mode')) {
+                moonIcon.style.display = 'inline-block';
+                sunIcon.style.display = 'none';
+            } else {
+                moonIcon.style.display = 'none';
+                sunIcon.style.display = 'inline-block';
+            }
+        });
+    </script>
+</body>
+</html>

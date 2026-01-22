@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New Tab</title>
+    <!-- Tailwind CSS CDN for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Font - Inter for a modern, clean look -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome CDN for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" xintegrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2jrdEXhAQd4QyUtuzK7jtyp2oPoRTO9jsHjGg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+        /* Custom styles for the Inter font and smooth transitions */
+        body {
+            font-family: 'Inter', sans-serif;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        /* Styling for the light theme - made even lighter and more minimalistic */
+        html.light body {
+            background-color: #fcfcfc; /* Very light background */
+            color: #333; /* Dark text */
+        }
+        html.light .card {
+            background-color: #ffffff; /* Pure white card background */
+            /* Softer, more subtle shadow for a minimalistic feel */
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+        }
+        html.light input[type="text"],
+        html.light button {
+            background-color: #ffffff; /* White input/button background */
+            color: #333;
+            border: 1px solid #e0e0e0; /* Very light border */
+        }
+        html.light button:hover {
+            background-color: #f5f5f5; /* Subtle hover effect */
+        }
+
+        /* Styling for the dark theme */
+        html.dark body {
+            background-color: #1a202c; /* Dark background (Tailwind's gray-900) */
+            color: #e2e8f0; /* Light text (Tailwind's gray-200) */
+        }
+        html.dark .card {
+            background-color: #2d3748; /* Dark card background (Tailwind's gray-800) */
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.15); /* Stronger shadow for contrast */
+        }
+        html.dark input[type="text"],
+        html.dark button {
+            background-color: #4a5568; /* Darker input/button background */
+            color: #e2e8f0; /* Light text */
+            border: 1px solid #2d3748; /* Darker border */
+        }
+        html.dark button:hover {
+            background-color: #5b677b;
+        }
+
+        /* Focus styles for inputs and buttons */
+        input[type="text"]:focus,
+        button:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.5); /* Blue focus ring */
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen p-4 text-center">
+    <div class="card w-full max-w-lg p-8 rounded-lg relative transition-all duration-300 ease-in-out">
+        <!-- Light/Dark Mode Toggle Button -->
+        <button id="theme-toggle" class="absolute top-4 right-4 p-2 rounded-full text-lg transition-colors duration-300 ease-in-out hover:opacity-80">
+            <!-- Icon will be dynamically updated by JavaScript -->
+            <i class="fas fa-moon"></i>
+        </button>
+
+        <!-- Time and Date Display -->
+        <div class="mb-8">
+            <h1 id="current-time" class="text-6xl md:text-7xl font-bold mb-2 transition-colors duration-300 ease-in-out"></h1>
+            <p id="current-date" class="text-xl md:text-2xl transition-colors duration-300 ease-in-out"></p>
+        </div>
+
+        <!-- Search Bar -->
+        <div class="mb-8">
+            <input type="text" id="search-input" placeholder="Search..." class="w-full p-4 rounded-lg text-lg text-center transition-all duration-300 ease-in-out focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+        </div>
+
+        <!-- Search Engine Icons/Buttons -->
+        <div class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <button class="search-btn p-4 rounded-lg transition-colors duration-300 ease-in-out hover:scale-105 active:scale-95" data-engine="google">
+                <i class="fab fa-google text-2xl"></i>
+                <span class="block text-sm mt-1">Google</span>
+            </button>
+            <button class="search-btn p-4 rounded-lg transition-colors duration-300 ease-in-out hover:scale-105 active:scale-95" data-engine="bing">
+                <i class="fas fa-search text-2xl"></i> <!-- Changed to generic search icon -->
+                <span class="block text-sm mt-1">Bing</span>
+            </button>
+            <button class="search-btn p-4 rounded-lg transition-colors duration-300 ease-in-out hover:scale-105 active:scale-95" data-engine="wikipedia">
+                <i class="fab fa-wikipedia-w text-2xl"></i>
+                <span class="block text-sm mt-1">Wikipedia</span>
+            </button>
+            <button class="search-btn p-4 rounded-lg transition-colors duration-300 ease-in-out hover:scale-105 active:scale-95" data-engine="github">
+                <i class="fab fa-github text-2xl"></i>
+                <span class="block text-sm mt-1">GitHub</span>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Get references to DOM elements
+        const currentTimeElement = document.getElementById('current-time');
+        const currentDateElement = document.getElementById('current-date');
+        const searchInput = document.getElementById('search-input');
+        const searchButtons = document.querySelectorAll('.search-btn');
+        const themeToggle = document.getElementById('theme-toggle');
+        const htmlElement = document.documentElement; // Reference to the <html> tag
+
+        // --- Theme Toggling Functionality ---
+        const setInitialTheme = () => {
+            // Check local storage for a saved theme preference
+            const savedTheme = localStorage.getItem('theme');
+            // Default to 'light' if no preference is found
+            if (savedTheme) {
+                htmlElement.classList.remove('light', 'dark'); // Remove existing classes
+                htmlElement.classList.add(savedTheme); // Add the saved theme class
+                updateThemeToggleIcon(savedTheme); // Update the icon accordingly
+            } else {
+                // If no saved theme, check system preference
+                if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                    htmlElement.classList.remove('light');
+                    htmlElement.classList.add('dark');
+                    localStorage.setItem('theme', 'dark');
+                    updateThemeToggleIcon('dark');
+                } else {
+                    htmlElement.classList.remove('dark');
+                    htmlElement.classList.add('light');
+                    localStorage.setItem('theme', 'light');
+                    updateThemeToggleIcon('light');
+                }
+            }
+        };
+
+        const updateThemeToggleIcon = (theme) => {
+            // Update the icon based on the current theme
+            if (theme === 'dark') {
+                themeToggle.innerHTML = '<i class="fas fa-sun"></i>'; // Show sun icon for dark mode
+                themeToggle.setAttribute('aria-label', 'Switch to light mode');
+            } else {
+                themeToggle.innerHTML = '<i class="fas fa-moon"></i>'; // Show moon icon for light mode
+                themeToggle.setAttribute('aria-label', 'Switch to dark mode');
+            }
+        };
+
+        const toggleTheme = () => {
+            // Get the current theme from the HTML element's class list
+            const currentTheme = htmlElement.classList.contains('dark') ? 'dark' : 'light';
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+
+            // Update the HTML element's class and local storage
+            htmlElement.classList.remove(currentTheme);
+            htmlElement.classList.add(newTheme);
+            localStorage.setItem('theme', newTheme);
+
+            // Update the toggle button icon
+            updateThemeToggleIcon(newTheme);
+        };
+
+        // Add event listener to the theme toggle button
+        themeToggle.addEventListener('click', toggleTheme);
+
+        // Set the initial theme when the page loads
+        setInitialTheme();
+
+        // --- Time and Date Functionality ---
+        const updateTimeAndDate = () => {
+            const now = new Date(); // Get current date and time
+
+            // Format time (e.g., 10:30 PM)
+            const timeOptions = { hour: '2-digit', minute: '2-digit', hour12: true };
+            const formattedTime = now.toLocaleTimeString('en-US', timeOptions);
+            currentTimeElement.textContent = formattedTime;
+
+            // Format date (e.g., Monday, May 20, 2024)
+            const dateOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            const formattedDate = now.toLocaleDateString('en-US', dateOptions);
+            currentDateElement.textContent = formattedDate;
+        };
+
+        // Update time and date immediately on load
+        updateTimeAndDate();
+        // Update time and date every second
+        setInterval(updateTimeAndDate, 1000);
+
+        // --- Search Functionality ---
+        const searchEngines = {
+            google: 'https://www.google.com/search?q=',
+            bing: 'https://www.bing.com/search?q=',
+            wikipedia: 'https://en.wikipedia.org/wiki/Special:Search?search=',
+            github: 'https://github.com/search?q='
+        };
+
+        const performSearch = (engine) => {
+            const query = searchInput.value.trim(); // Get search input and trim whitespace
+
+            if (query) {
+                // Construct the full search URL
+                const searchUrl = searchEngines[engine] + encodeURIComponent(query);
+                // Open the search URL in a new tab
+                window.open(searchUrl, '_blank');
+            } else {
+                console.log("Please enter a search query.");
+            }
+        };
+
+        // Add event listeners to each search engine button
+        searchButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const engine = button.dataset.engine; // Get the engine type from data-engine attribute
+                performSearch(engine);
+            });
+        });
+
+        // Add event listener for Enter key in the search input
+        searchInput.addEventListener('keydown', (event) => {
+            // Default to Google search if Enter is pressed
+            if (event.key === 'Enter') {
+                performSearch('google');
+            }
+        });
+
+        // Focus the search input on page load for immediate typing
+        searchInput.focus();
+    </script>
+</body>
+</html>

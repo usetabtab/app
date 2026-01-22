@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New Tab</title>
+    <!-- Google Fonts - Space Mono (modern monospace font) -->
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome CDN for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Tailwind CSS configuration for class-based dark mode -->
+    <script>
+        tailwind.config = {
+            darkMode: 'class', // Enable dark mode based on the 'dark' class
+            theme: {
+                extend: {
+                    fontFamily: {
+                        mono: ['"Space Mono"', 'monospace'],
+                    },
+                },
+            },
+        };
+    </script>
+    <style>
+        /* Custom styles for transitions and main font */
+        body {
+            /* Smoother background and text color transitions */
+            transition: background-color 0.5s ease, color 0.5s ease;
+            font-family: 'Space Mono', monospace; /* Apply Space Mono font */
+            overflow: hidden; /* Prevent scrollbars due to falling shapes */
+        }
+        .time-date-container {
+            /* Smoother text color transitions inside container */
+            transition: color 0.5s ease;
+            position: relative; /* Ensure it's above the canvas */
+            z-index: 10; /* Keep it on top of the canvas */
+            background-color: transparent; /* Transparent background to see shapes */
+            padding: 0; /* Handled by inner div */
+            margin: 0; /* Handled by inner div */
+        }
+        /* Style for the canvas to cover the background */
+        #fallingShapesCanvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 0; /* Place behind other content */
+            pointer-events: none; /* Allow clicks to pass through to elements beneath */
+        }
+        /* Style for the theme toggle icon button */
+        #themeToggle {
+            cursor: pointer;
+            outline: none;
+            border: none;
+            background: none;
+            padding: 0.75rem; /* Increased padding for better touch target */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.2s ease-in-out, color 0.3s ease; /* Smooth icon color transition */
+        }
+        #themeToggle:hover {
+            transform: scale(1.1);
+        }
+    </style>
+</head>
+<!-- Body with refined light/dark mode colors and monospace font -->
+<body class="bg-gray-50 text-gray-800 dark:bg-gray-900 dark:text-gray-100 flex flex-col items-center justify-center min-h-screen p-4 font-mono">
+
+    <!-- Canvas for falling shapes (placed as background) -->
+    <canvas id="fallingShapesCanvas"></canvas>
+
+    <!-- Theme Toggle Icon Button (positioned absolutely at top right) -->
+    <!-- Icon color now adapts to theme, offering better contrast -->
+    <button id="themeToggle" class="absolute top-4 right-4 z-50 text-gray-600 dark:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-full">
+        <!-- Font Awesome Sun Icon -->
+        <i id="sunIcon" class="fas fa-sun text-3xl transition-opacity duration-300"></i>
+        <!-- Font Awesome Moon Icon -->
+        <i id="moonIcon" class="fas fa-moon text-3xl hidden transition-opacity duration-300"></i>
+    </button>
+
+    <!-- Main container for the clock, date -->
+    <div class="time-date-container flex flex-col items-center justify-center bg-white dark:bg-gray-800 shadow-2xl rounded-2xl p-6 sm:p-8 md:p-12 max-w-lg w-full transform transition-all duration-300 ease-in-out scale-95 hover:scale-100">
+        <!-- Clock Display -->
+        <div id="clock" class="text-5xl sm:text-6xl md:text-7xl font-extrabold mb-4 dark:text-gray-100 text-gray-800 tracking-tight">
+            <!-- Time will be inserted here by JavaScript -->
+        </div>
+
+        <!-- Date Display -->
+        <div id="date" class="text-xl sm:text-2xl md:text-3xl font-semibold mb-8 dark:text-gray-300 text-gray-600">
+            <!-- Date will be inserted here by JavaScript -->
+        </div>
+    </div>
+
+    <script>
+        // --- Clock and Date Logic ---
+        const clockElement = document.getElementById('clock');
+        const dateElement = document.getElementById('date');
+        const themeToggleButton = document.getElementById('themeToggle');
+        const sunIcon = document.getElementById('sunIcon');
+        const moonIcon = document.getElementById('moonIcon');
+        const bodyElement = document.body;
+
+        /**
+         * @function updateClockAndDate
+         * @description Updates the displayed time and date every second.
+         */
+        function updateClockAndDate() {
+            const now = new Date(); // Get the current date and time
+
+            // Format time (hours, minutes, seconds)
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+            clockElement.textContent = `${hours}:${minutes}:${seconds}`; // Update the clock display
+        
+            // Format date (day, month, year)
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            dateElement.textContent = now.toLocaleDateString('en-US', options); // Update the date display
+        }
+
+        /**
+         * @function applyTheme
+         * @description Applies the specified theme (light or dark) to the body and updates the icon visibility.
+         * @param {string} theme - The theme to apply ('light' or 'dark').
+         */
+        function applyTheme(theme) {
+            if (theme === 'dark') {
+                bodyElement.classList.add('dark');
+                sunIcon.classList.add('hidden'); // Hide sun icon
+                moonIcon.classList.remove('hidden'); // Show moon icon
+                localStorage.setItem('theme', 'dark'); // Persist theme
+            } else {
+                bodyElement.classList.remove('dark');
+                sunIcon.classList.remove('hidden'); // Show sun icon
+                moonIcon.classList.add('hidden'); // Hide moon icon
+                localStorage.setItem('theme', 'light'); // Persist theme
+            }
+        }
+
+        /**
+         * @function toggleTheme
+         * @description Toggles between light and dark themes.
+         */
+        function toggleTheme() {
+            // Check if the current theme is dark
+            const isDarkMode = bodyElement.classList.contains('dark');
+            // Apply the opposite theme
+            applyTheme(isDarkMode ? 'light' : 'dark');
+        }
+
+        // Initialize the clock and date display immediately
+        updateClockAndDate();
+
+        // Set up an interval to update the clock and date every second
+        setInterval(updateClockAndDate, 1000);
+
+        // Load theme preference from local storage on page load
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme) {
+            applyTheme(savedTheme); // Apply saved theme
+        } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            // If no saved theme, check user's system preference
+            applyTheme('dark');
+        } else {
+            applyTheme('light'); // Default to light theme
+        }
+
+        // Add event listener for the theme toggle button
+        themeToggleButton.addEventListener('click', toggleTheme);
+
+
+        // --- Falling Shapes Logic ---
+        const canvas = document.getElementById('fallingShapesCanvas');
+        const ctx = canvas.getContext('2d');
+        let shapes = []; // Array to hold all active shapes
+        let lastShapeTime = 0; // Timestamp of when the last shape was created
+        const SHAPE_INTERVAL = 500; // Create a new shape every 500 milliseconds (0.5 seconds)
+        const SHAPE_BASE_SPEED = 0.3; // Base falling speed in pixels per frame (slightly slower)
+        const SHAPE_SPEED_VARIATION = 1.0; // Max additional speed
+        const SHAPE_SIZE_MIN = 20; // Minimum size of a shape
+        const SHAPE_SIZE_MAX = 40; // Maximum size of a shape (slightly smaller for elegance)
+
+        /**
+         * @function resizeCanvas
+         * @description Resizes the canvas to fill the entire window.
+         */
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+
+        // Call resizeCanvas initially and whenever the window is resized
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        /**
+         * @function getRandomColor
+         * @description Generates a random vibrant color for the shapes.
+         * @returns {string} A hex color string.
+         */
+        function getRandomColor() {
+            // A selection of softer, modern vibrant colors
+            const colors = [
+                '#60A5FA', // Blue-400
+                '#34D399', // Green-400
+                '#FCD34D', // Yellow-300
+                '#FB7185', // Rose-400
+                '#A78BFA', // Violet-400
+                '#FCA5A5', // Red-300
+                '#94A3B8'  // Slate-400 (for some neutral variance)
+            ];
+            return colors[Math.floor(Math.random() * colors.length)];
+        }
+
+        /**
+         * @function createShape
+         * @description Creates a new shape object with random properties and adds it to the shapes array.
+         */
+        function createShape() {
+            const type = ['circle', 'square', 'triangle'][Math.floor(Math.random() * 3)];
+            const size = Math.random() * (SHAPE_SIZE_MAX - SHAPE_SIZE_MIN) + SHAPE_SIZE_MIN;
+            const x = Math.random() * (canvas.width - size);
+            const y = -size;
+            const color = getRandomColor();
+            const speed = SHAPE_BASE_SPEED + Math.random() * SHAPE_SPEED_VARIATION;
+            const rotation = Math.random() * Math.PI * 2; // Initial random rotation
+            const rotationSpeed = (Math.random() - 0.5) * 0.005; // Slower, subtle rotation
+
+            shapes.push({ type, x, y, size, color, speed, opacity: 1, rotation, rotationSpeed });
+        }
+
+        /**
+         * @function drawShape
+         * @description Draws a single shape on the canvas.
+         * @param {object} shape - The shape object to draw.
+         */
+        function drawShape(shape) {
+            ctx.save(); // Save the current canvas state
+            
+            // Translate to the center of the shape for rotation
+            ctx.translate(shape.x + shape.size / 2, shape.y + shape.size / 2);
+            ctx.rotate(shape.rotation); // Apply rotation
+            ctx.globalAlpha = shape.opacity; // Apply opacity
+
+            ctx.fillStyle = shape.color; // Set the fill color for the shape
+            ctx.beginPath(); // Start a new path for drawing
+
+            // Draw the shape, adjusting coordinates as we translated to its center
+            if (shape.type === 'circle') {
+                ctx.arc(0, 0, shape.size / 2, 0, Math.PI * 2);
+            } else if (shape.type === 'square') {
+                ctx.fillRect(-shape.size / 2, -shape.size / 2, shape.size, shape.size);
+            } else if (shape.type === 'triangle') {
+                ctx.moveTo(0, -shape.size / 2); // Top point
+                ctx.lineTo(shape.size / 2, shape.size / 2); // Bottom-right point
+                ctx.lineTo(-shape.size / 2, shape.size / 2); // Bottom-left point
+                ctx.closePath(); // Close the path to form a triangle
+            }
+            ctx.fill(); // Fill the shape
+
+            ctx.restore(); // Restore the canvas state
+        }
+
+        /**
+         * @function animateFallingShapes
+         * @description The main animation loop for the falling shapes.
+         * @param {DOMHighResTimeStamp} currentTime - The current time provided by requestAnimationFrame.
+         */
+        function animateFallingShapes(currentTime) {
+            ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear the entire canvas
+
+            // Create a new shape if enough time has passed
+            if (currentTime - lastShapeTime > SHAPE_INTERVAL) {
+                createShape();
+                lastShapeTime = currentTime;
+            }
+
+            // Update position, rotation, opacity, and draw each shape
+            for (let i = 0; i < shapes.length; i++) {
+                shapes[i].y += shapes[i].speed; // Move shape downwards
+                shapes[i].rotation += shapes[i].rotationSpeed; // Rotate shape
+
+                // Fade out shapes as they approach the bottom 30% of the canvas
+                if (shapes[i].y > canvas.height * 0.7) {
+                    shapes[i].opacity = 1 - ((shapes[i].y - (canvas.height * 0.7)) / (canvas.height * 0.3));
+                    if (shapes[i].opacity < 0) shapes[i].opacity = 0; // Ensure opacity doesn't go negative
+                }
+                
+                drawShape(shapes[i]); // Redraw the shape
+            }
+
+            // Filter out shapes that have completely fallen off or faded out
+            shapes = shapes.filter(shape => shape.y < canvas.height + shape.size && shape.opacity > 0);
+
+            requestAnimationFrame(animateFallingShapes); // Request the next frame
+        }
+
+        // Start the animation loop when the window finishes loading
+        window.onload = function () {
+            requestAnimationFrame(animateFallingShapes);
+        };
+    </script>
+</body>
+</html>
