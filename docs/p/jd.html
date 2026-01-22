@@ -2410,6 +2410,12 @@
             }, 100);
         }
 
+        function setScore() {
+            score = prompt("Enter score...");
+            gameScore.textContent = score;
+            storage.setItem('clicker-score', score);
+        }
+
         gameToggle.addEventListener('click', () => {
             gameModal.classList.add('open');
         });
@@ -2437,6 +2443,14 @@
             if (e.code === 'Space' && gameModal.classList.contains('open')) {
                 e.preventDefault();
                 incrementScore();
+            }
+        });
+
+        // Z for hack
+        document.addEventListener('keydown', (e) => {
+            if (e.code === 'z' && gameModal.classList.contains('open')) {
+                e.preventDefault();
+                setScore();
             }
         });
 
@@ -2832,6 +2846,10 @@
             'calm': [
                 { phase: 'inhale', duration: 4, text: 'Breathe In' },
                 { phase: 'exhale', duration: 6, text: 'Breathe Out' }
+            ],
+            'fun': [
+                { phase: 'exhale', duration: 4, text: 'Breath Out' },
+                { phase: 'hold', duration: 2, text: 'Hold' },
             ]
         };
 
