@@ -1,2 +1,7 @@
-# app
-TabTab main app
+# TabTab App
+
+**Main app for TabTab**
+
+---
+
+✨ Free open source new tab pages for public and private use
