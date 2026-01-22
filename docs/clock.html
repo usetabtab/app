@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New Tab | Clock</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.0.3/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/109/109613.png">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,100;1,100&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+        .clock-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+            height: 50vh;
+            justify-content: center;
+        }
+        .clock-box {
+            color: black;
+            font-family: 'Roboto Mono', monospace;
+            font-size: 10rem;
+            padding: 1rem 2rem;
+            border-radius: 1rem;
+        }
+      	#digitalClock {
+		    padding: 10px;
+		    width: 1000px;
+		    height: 300px;
+		    border-radius: 20px;
+		    font-size: 10rem;
+		    text-align: center;
+		    display: flex;
+		    justify-content: center;
+		    align-items: center;
+      		font-family: 'Roboto Mono';
+      		border: 1px solid lightgray;
+		}
+        .date-box {
+            position: relative;
+            color: black;
+      		border: 1px solid lightgray;
+            font-family: 'Roboto Mono';
+            font-size: 2rem;
+            padding: 1.2rem 2rem;
+            border-radius: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+        a.back-link {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            color: black;
+            font-family: 'Roboto Mono';
+            padding: 8px 12px;
+      		border: 1px solid lightgrey;
+            border-radius: 10px;
+        }
+      	a.view-timetable {
+            position: absolute;
+            bottom: 15px;
+            right: 15px;
+            color: black;
+            font-family: 'Roboto Mono';
+            padding: 8px 12px;
+      		border: 1px solid lightgray;
+            border-radius: 10px;
+        }
+        .progress-bar {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            background: linear-gradient(90deg, #34d399, #3b82f6);
+            opacity: 0.3;
+            z-index: 0;
+            transition: width 1s linear;
+        }
+        #countdownBox span {
+            position: relative;
+            z-index: 1;
+            line-height: 1.5;
+        }
+      	#vt-button {
+      		font-family: Roboto Mono;
+      	}
+    </style>
+</head>
+<body>
+    <div class="clock-container">
+	    <a href="fullscreen-clock.html"><div id="digitalClock" align="center"></div></a>
+        <div id="dateBox" class="date-box"></div>
+        <div id="countdownBox" class="date-box">
+            <div class="progress-bar" id="progressBar"></div>
+            <span id="countdownText"></span>
+        </div>
+    </div>
+
+    <a href="index.html" class="back-link">&lt; Back</a>
+
+    <a id="vt-button" href="https://vle.bromcomcloud.com/" 
+       class="view-timetable">
+       View Timetable
+    </a>
+
+    <script>
+    const scheduledTimes = ["08:00", "08:25", "08:50", "09:40", "10:30", "10:50", "11:40", "12:30", "13:10", "14:00", "14:50"];
+
+    function updateClock() {
+        const digitalClock = document.getElementById('digitalClock');
+        const dateBox = document.getElementById('dateBox');
+        const countdownText = document.getElementById('countdownText');
+        const progressBar = document.getElementById('progressBar');
+
+        const now = new Date();
+        const hours = String(now.getHours()).padStart(2, '0');
+        const minutes = String(now.getMinutes()).padStart(2, '0');
+        const seconds = String(now.getSeconds()).padStart(2, '0');
+        const day = String(now.getDate()).padStart(2, '0');
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const year = now.getFullYear();
+
+        digitalClock.textContent = `${hours}:${minutes}:${seconds}`;
+        dateBox.textContent = `${month}/${day}/${year}`;
+
+        const nextTime = findNextScheduledTime(now);
+        const currentStartTime = findCurrentStartTime(now);
+
+        if (nextTime && currentStartTime) {
+            const diffMs = nextTime - now;
+            const diffSeconds = Math.floor(diffMs / 1000);
+            const minutesLeft = Math.floor(diffSeconds / 60).toString().padStart(2, '0');
+            const secondsLeft = (diffSeconds % 60).toString().padStart(2, '0');
+            countdownText.textContent = `Next in: ${minutesLeft}:${secondsLeft}`;
+
+            const periodLength = nextTime - currentStartTime;
+            const elapsed = now - currentStartTime;
+            const progressPercent = Math.min((elapsed / periodLength) * 100, 100);
+            progressBar.style.width = `${progressPercent}%`;
+        } else {
+            countdownText.textContent = `No more scheduled times today`;
+            progressBar.style.width = `0%`;
+        }
+    }
+
+    function findNextScheduledTime(currentDate) {
+        for (const time of scheduledTimes) {
+            const [h, m] = time.split(':').map(Number);
+            const scheduledDate = new Date(
+                currentDate.getFullYear(),
+                currentDate.getMonth(),
+                currentDate.getDate(),
+                h, m, 0
+            );
+            if (scheduledDate > currentDate) {
+                return scheduledDate;
+            }
+        }
+        return null;
+    }
+
+    function findCurrentStartTime(currentDate) {
+        let lastTime = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate(), 0, 0, 0);
+        for (const time of scheduledTimes) {
+            const [h, m] = time.split(':').map(Number);
+            const scheduledDate = new Date(
+                currentDate.getFullYear(),
+                currentDate.getMonth(),
+                currentDate.getDate(),
+                h, m, 0
+            );
+            if (scheduledDate <= currentDate) {
+                lastTime = scheduledDate;
+            } else {
+                break;
+            }
+        }
+        return lastTime;
+    }
+
+    setInterval(updateClock, 1000);
+    updateClock();
+
+
+    </script>
+</body>
+</html>

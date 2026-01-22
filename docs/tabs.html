@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tab Index</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+    body {
+        background: linear-gradient(135deg, #e0e7ff 0%, #f3e8ff 100%);
+        position: relative; /* Ensures proper z-index stacking */
+        z-index: 1;
+    }
+    .gradient-text {
+        background: linear-gradient(to right, #8b5cf6, #3b82f6);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+    }
+    .animate-fade-in-up {
+        animation: fadeInUp 1s ease-out;
+    }
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    .geometric-bg {
+        position: relative;
+        z-index: 1; /* Ensures it's above the background layer */
+    }
+    .geometric-bg::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-image: 
+            linear-gradient(45deg, rgba(0,0,0,0.03) 10%, transparent 10%, transparent 50%, rgba(0,0,0,0.03) 50%, rgba(0,0,0,0.03) 60%, transparent 60%),
+            linear-gradient(-135deg, rgba(0,0,0,0.03) 15%, transparent 15%, transparent 45%, rgba(0,0,0,0.03) 45%, rgba(0,0,0,0.03) 55%, transparent 55%),
+            linear-gradient(30deg, rgba(0,0,0,0.02) 20%, transparent 20%, transparent 40%, rgba(0,0,0,0.02) 40%, rgba(0,0,0,0.02) 50%, transparent 50%);
+        background-size: 100px 100px, 80px 80px, 120px 120px;
+        background-position: 20% 30%, 60% 70%, 40% 50%;
+        opacity: 0.7;
+        z-index: 0;               /* Pushes it behind content */
+        pointer-events: none;     /* Makes it 'invisible' to clicks */
+    }
+    .tab-card {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        position: relative; /* Ensures stacking context */
+        z-index: 1;
+    }
+    .tab-card:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+    }
+    .instruction-text a {
+        background: linear-gradient(to right, #8b5cf6, #3b82f6);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        font-weight: 500;
+    }
+</style>
+
+</head>
+<body class="min-h-screen geometric-bg p-6 md:p-12">
+    <h1 class="text-4xl md:text-5xl font-medium text-center gradient-text animate-fade-in-up mb-8">
+        Tab Index
+    </h1>
+    <p class="text-lg text-gray-600 text-center mb-10 instruction-text animate-fade-in-up">
+        Click on a tab you like, copy the URL, then <a href="setup.html" class="hover:underline">go here</a>.
+    </p>
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        <a href="tabs/a.html" target="_blank" class="tab-card block rounded-xl overflow-hidden">
+            <img src="assets/tabthumbs/a.jpg" alt="Tab A preview" class="w-full h-48 object-cover shadow-lg" loading="lazy">
+        </a>
+        <a href="tabs/b.html" target="_blank" class="tab-card block rounded-xl overflow-hidden">
+            <img src="assets/tabthumbs/b.jpg" alt="Tab B preview" class="w-full h-48 object-cover shadow-lg" loading="lazy">
+        </a>
+        <a href="tabs/c.html" target="_blank" class="tab-card block rounded-xl overflow-hidden">
+            <img src="assets/tabthumbs/c.jpg" alt="Tab C preview" class="w-full h-48 object-cover shadow-lg" loading="lazy">
+        </a>
+        <a href="tabs/d.html" target="_blank" class="tab-card block rounded-xl overflow-hidden">
+            <img src="assets/tabthumbs/d.jpg" alt="Tab D preview" class="w-full h-48 object-cover shadow-lg" loading="lazy">
+        </a>
+        <a href="tabs/e.html" target="_blank" class="tab-card block rounded-xl overflow-hidden">
+            <img src="assets/tabthumbs/e.jpg" alt="Tab E preview" class="w-full h-48 object-cover shadow-lg" loading="lazy">
+        </a>
+        <a href="tabs/f.html" target="_blank" class="tab-card block rounded-xl overflow-hidden">
+            <img src="assets/tabthumbs/f.jpg" alt="Tab F preview" class="w-full h-48 object-cover shadow-lg" loading="lazy">
+        </a>
+        <a href="tabs/g.html" target="_blank" class="tab-card block rounded-xl overflow-hidden">
+            <img src="assets/tabthumbs/g.jpg" alt="Tab G preview" class="w-full h-48 object-cover shadow-lg" loading="lazy">
+        </a>
+        <a href="tabs/h.html" target="_blank" class="tab-card block rounded-xl overflow-hidden">
+            <img src="assets/tabthumbs/h.jpg" alt="Tab H preview" class="w-full h-48 object-cover shadow-lg" loading="lazy">
+        </a>
+        <a href="tabs/i.html" target="_blank" class="tab-card block rounded-xl overflow-hidden">
+            <img src="assets/tabthumbs/i.jpg" alt="Tab I preview" class="w-full h-48 object-cover shadow-lg" loading="lazy">
+        </a>
+        <a href="tabs/j.html" target="_blank" class="tab-card block rounded-xl overflow-hidden">
+            <img src="assets/tabthumbs/j.jpg" alt="Tab J preview" class="w-full h-48 object-cover shadow-lg" loading="lazy">
+        </a>
+        <a href="tabs/k.html" target="_blank" class="tab-card block rounded-xl overflow-hidden">
+            <img src="assets/tabthumbs/k.jpg" alt="Tab K preview" class="w-full h-48 object-cover shadow-lg" loading="lazy">
+        </a>
+        <a href="tabs/l.html" target="_blank" class="tab-card block rounded-xl overflow-hidden">
+            <img src="assets/tabthumbs/l.jpg" alt="Tab L preview" class="w-full h-48 object-cover shadow-lg" loading="lazy">
+        </a>
+        <a href="tabs/m.html" target="_blank" class="tab-card block rounded-xl overflow-hidden">
+            <img src="assets/tabthumbs/m.jpg" alt="Tab M preview" class="w-full h-48 object-cover shadow-lg" loading="lazy">
+        </a>
+        <a href="tabs/n.html" target="_blank" class="tab-card block rounded-xl overflow-hidden">
+            <img src="assets/tabthumbs/n.jpg" alt="Tab N preview" class="w-full h-48 object-cover shadow-lg" loading="lazy">
+        </a>
+        <a href="tabs/o.html" target="_blank" class="tab-card block rounded-xl overflow-hidden">
+            <img src="assets/tabthumbs/o.jpg" alt="Tab O preview" class="w-full h-48 object-cover shadow-lg" loading="lazy">
+        </a>
+        <a href="tabs/p.html" target="_blank" class="tab-card block rounded-xl overflow-hidden">
+            <img src="assets/tabthumbs/p.jpg" alt="Tab P preview" class="w-full h-48 object-cover shadow-lg" loading="lazy">
+        </a>
+        <a href="tabs/q.html" target="_blank" class="tab-card block rounded-xl overflow-hidden">
+            <img src="assets/tabthumbs/q.jpg" alt="Tab Q preview" class="w-full h-48 object-cover shadow-lg" loading="lazy">
+        </a>
+        <a href="tabs/r.html" target="_blank" class="tab-card block rounded-xl overflow-hidden">
+            <img src="assets/tabthumbs/r.jpg" alt="Tab R preview" class="w-full h-48 object-cover shadow-lg" loading="lazy">
+        </a>
+        <a href="tabs/s.html" target="_blank" class="tab-card block rounded-xl overflow-hidden">
+            <img src="assets/tabthumbs/s.jpg" alt="Tab S preview" class="w-full h-48 object-cover shadow-lg" loading="lazy">
+        </a>
+        <a href="tabs/t.html" target="_blank" class="tab-card block rounded-xl overflow-hidden">
+            <img src="assets/tabthumbs/t.jpg" alt="Tab T preview" class="w-full h-48 object-cover shadow-lg" loading="lazy">
+        </a>
+        <a href="tabs/u.html" target="_blank" class="tab-card block rounded-xl overflow-hidden">
+            <img src="assets/tabthumbs/u.jpg" alt="Tab U preview" class="w-full h-48 object-cover shadow-lg" loading="lazy">
+        </a>
+        <a href="tabs/v.html" target="_blank" class="tab-card block rounded-xl overflow-hidden">
+            <img src="assets/tabthumbs/v.jpg" alt="Tab V preview" class="w-full h-48 object-cover shadow-lg" loading="lazy">
+        </a>
+        <a href="tabs/w.html" target="_blank" class="tab-card block rounded-xl overflow-hidden">
+            <img src="assets/tabthumbs/w.jpg" alt="Tab W preview" class="w-full h-48 object-cover shadow-lg" loading="lazy">
+        </a>
+        <a href="tabs/x.html" target="_blank" class="tab-card block rounded-xl overflow-hidden">
+            <img src="assets/tabthumbs/x.jpg" alt="Tab X preview" class="w-full h-48 object-cover shadow-lg" loading="lazy">
+        </a>
+        <a href="tabs/y.html" target="_blank" class="tab-card block rounded-xl overflow-hidden">
+            <img src="assets/tabthumbs/y.jpg" alt="Tab Y preview" class="w-full h-48 object-cover shadow-lg" loading="lazy">
+        </a>
+        <a href="tabs/z.html" target="_blank" class="tab-card block rounded-xl overflow-hidden">
+            <img src="assets/tabthumbs/z.jpg" alt="Tab Z preview" class="w-full h-48 object-cover shadow-lg" loading="lazy">
+        </a>
+    </div>
+</body>
+</html>

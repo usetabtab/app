@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Clock</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@500&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background: #fff;
+      font-family: 'Roboto Mono', monospace;
+      overflow: hidden;
+    }
+
+    .clock {
+      width: 300px;
+      height: 300px;
+      border: 8px solid #ccc;
+      border-radius: 50%;
+      background: #f9f9f9;
+      position: relative;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
+	  user-select: none;
+	  -webkit-user-select: none;
+	  -ms-user-select: none;
+    }
+
+    .hand {
+      position: absolute;
+      bottom: 50%;
+      left: 50%;
+      transform-origin: center bottom;
+	  transform: translate(-50%, 0) rotate(90deg);
+    }
+
+    .hour {
+      width: 6px;
+      height: 70px;
+      background: #666;
+      border-radius: 4px;
+    }
+
+    .minute {
+      width: 4px;
+      height: 100px;
+      background: #999;
+      border-radius: 4px;
+    }
+
+    .second {
+      width: 2px;
+      height: 110px;
+      background: #bbb;
+      border-radius: 4px;
+    }
+
+    .center {
+      width: 12px;
+      height: 12px;
+      background: #999;
+      border-radius: 50%;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 10;
+    }
+
+    .tick {
+      position: absolute;
+      width: 2px;
+      height: 10px;
+      background: #ddd;
+      top: 0;
+      left: 50%;
+      transform-origin: center 150px;
+    }
+
+    .tick.major {
+      height: 16px;
+      background: #bbb;
+    }
+
+    .number {
+      position: absolute;
+      width: 24px;
+      height: 24px;
+      text-align: center;
+      line-height: 24px;
+      color: #aaa;
+      font-size: 14px;
+      font-weight: 500;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+    }
+
+    .digital {
+      margin-top: 20px;
+      font-size: 24px;
+      color: #666;
+      letter-spacing: 2px;
+      user-select: none;
+	  -webkit-user-select: none;
+	  -ms-user-select: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="clock" id="clock">
+    <div class="hand hour" id="hour"></div>
+    <div class="hand minute" id="minute"></div>
+    <div class="hand second" id="second"></div>
+    <div class="center"></div>
+  </div>
+  <div class="digital" id="digital-time">--:--:--</div>
+
+  <script>
+    const clock = document.getElementById('clock');
+    const hourHand = document.getElementById('hour');
+    const minuteHand = document.getElementById('minute');
+    const secondHand = document.getElementById('second');
+    const digitalTime = document.getElementById('digital-time');
+
+    // Add tick marks
+    for (let i = 0; i < 60; i++) {
+      const tick = document.createElement('div');
+      tick.className = 'tick';
+      if (i % 5 === 0) tick.classList.add('major');
+      tick.style.transform = `rotate(${i * 6}deg) translate(-50%, 0)`;
+      clock.appendChild(tick);
+    }
+
+    // Add hour numbers
+    for (let i = 1; i <= 12; i++) {
+      const number = document.createElement('div');
+      number.className = 'number';
+      const angle = (i * 30 - 90) * (Math.PI / 180);
+      const radius = 120;
+      const x = Math.cos(angle) * radius;
+      const y = Math.sin(angle) * radius;
+      number.style.left = `calc(50% + ${x}px)`;
+      number.style.top = `calc(50% + ${y}px)`;
+      number.innerText = i;
+      clock.appendChild(number);
+    }
+
+    function updateClock() {
+      const now = new Date();
+      const seconds = now.getSeconds() + now.getMilliseconds() / 1000;
+      const minutes = now.getMinutes() + seconds / 60;
+      const hours = now.getHours() + minutes / 60;
+
+      secondHand.style.transform = `rotate(${seconds * 6}deg)`;
+      minuteHand.style.transform = `rotate(${minutes * 6}deg)`;
+      hourHand.style.transform = `rotate(${(hours % 12) * 30}deg)`;
+
+      // Update digital clock
+      const pad = n => n.toString().padStart(2, '0');
+      digitalTime.textContent = `${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(Math.floor(seconds))}`;
+    }
+
+    function animate() {
+      updateClock();
+      requestAnimationFrame(animate);
+    }
+
+    animate();
+  </script>
+</body>
+</html>

@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Setup Custom New Tab</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #e0e7ff 0%, #f3e8ff 100%);
+        }
+        .gradient-text {
+            background: linear-gradient(to right, #8b5cf6, #3b82f6);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        .animate-fade-in-up {
+            animation: fadeInUp 1s ease-out;
+        }
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .geometric-bg {
+            position: relative;
+            overflow: hidden;
+        }
+        .geometric-bg::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: 
+                linear-gradient(45deg, rgba(0,0,0,0.03) 10%, transparent 10%, transparent 50%, rgba(0,0,0,0.03) 50%, rgba(0,0,0,0.03) 60%, transparent 60%),
+                linear-gradient(-135deg, rgba(0,0,0,0.03) 15%, transparent 15%, transparent 45%, rgba(0,0,0,0.03) 45%, rgba(0,0,0,0.03) 55%, transparent 55%),
+                linear-gradient(30deg, rgba(0,0,0,0.02) 20%, transparent 20%, transparent 40%, rgba(0,0,0,0.02) 40%, rgba(0,0,0,0.02) 50%, transparent 50%);
+            background-size: 100px 100px, 80px 80px, 120px 120px;
+            background-position: 20% 30%, 60% 70%, 40% 50%;
+            opacity: 0.7;
+        }
+        .instruction-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .instruction-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body class="min-h-screen geometric-bg p-6 md:p-12 font-inter text-gray-800">
+    <main class="max-w-3xl mx-auto">
+        <h1 class="text-4xl md:text-5xl font-medium text-center gradient-text animate-fade-in-up mb-8">
+            Set a Custom New Tab Page in Smoothwall (Firefox iOS)
+        </h1>
+        <div class="bg-white bg-opacity-90 backdrop-blur-sm p-8 rounded-xl shadow-lg instruction-card animate-fade-in-up">
+            <ol class="list-decimal list-inside space-y-4 text-lg text-gray-700">
+                <li>Open Smoothwall (Firefox iOS) on your iOS device.</li>
+                <li>Tap the menu '☰' at the bottom-right.</li>
+                <li>Select <strong>Settings</strong>.</li>
+                <li>Tap <strong>New Tab</strong> under the General section.</li>
+                <li>Choose <strong>Custom URL</strong>.</li>
+                <li>Paste the URL of your chosen tab from the Tab Index page.</li>
+                <li>Tap <strong>&lt; Back</strong> then <strong>Done</strong> to save.</li>
+            </ol>
+            <p class="mt-6 text-center text-gray-600">
+                Your new tab page is now set! Open a new tab to see it in action.
+            </p>
+        </div>
+        <div class="text-center mt-6">
+            <a href="tabs.html" class="inline-flex items-center justify-center p-0.5 text-sm font-medium text-gray-900 rounded-lg group bg-gradient-to-br from-purple-600 to-blue-500 group-hover:from-purple-600 group-hover:to-blue-500 hover:text-white focus:ring-4 focus:outline-none focus:ring-blue-300 transition-all duration-300 ease-in-out transform hover:scale-105">
+                <span class="relative px-5 py-2.5 transition-all ease-in duration-75 bg-white rounded-md group-hover:bg-opacity-0 text-gray-900 group-hover:text-white">
+                    Back to Tab Index
+                </span>
+            </a>
+        </div>
+    </main>
+</body>
+</html>
