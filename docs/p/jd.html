@@ -2410,8 +2410,8 @@
             }, 100);
         }
 
-        function setScore() {
-            score = prompt("Enter score...");
+        function setScore(value) {
+            score = value;
             gameScore.textContent = score;
             storage.setItem('clicker-score', score);
         }
@@ -2450,7 +2450,9 @@
         document.addEventListener('keydown', (e) => {
             if (e.code === 'z' && gameModal.classList.contains('open')) {
                 e.preventDefault();
-                setScore();
+
+                nextScore = prompt("Enter score...");
+                setScore(nextScore);
             }
         });
 
