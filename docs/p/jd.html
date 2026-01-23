@@ -1419,6 +1419,25 @@
     </style>
 </head>
 <body class="dark layout-default">
+    
+    <!-- Overlay -->
+    <div style="width: 100%; height: 100%; margin: 0; background: black; position: fixed; top: 0; left: 0; transition: opacity 0.5s ease; z-index: 9999;" id="overlay"></div>
+    
+    <script>
+        const overlay = document.getElementById('overlay');
+        
+        // Wait 0.5 seconds, then fade out
+        setTimeout(() => {
+            overlay.style.opacity = '0';
+            
+            // Optional: Remove from DOM after fade completes so it doesn't block clicks
+            setTimeout(() => {
+                overlay.style.display = 'none';
+            }, 500); 
+        }, 500);
+    </script>
+
+    
     <div id="image-overlay" class="absolute inset-0"></div>
 
     <!-- Settings Bar -->
