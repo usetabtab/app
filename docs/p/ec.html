@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>New Tab</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.tailwindcss.com "></script>
     <script>
         tailwind.config = {
             darkMode: 'class',
@@ -170,38 +170,50 @@
         const slideshow = document.getElementById('slideshow');
 
         const images = [
-            'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1920&q=80', // Mountain landscape
-            'https://images.unsplash.com/photo-1511884642898-4c92249e20b6?w=1920&q=80', // Ocean waves
-            'https://images.unsplash.com/photo-1518895949257-7621c3c786d7?w=1920&q=80', // Aurora
-            'https://images.unsplash.com/photo-1475274047050-1d0c0975c63e?w=1920&q=80', // Desert
-            'https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=1920&q=80', // Forest
-            'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=1920&q=80', // Lake
-            'https://images.unsplash.com/photo-1447752875215-b2761acb3c5d?w=1920&q=80', // Meadow
-            'https://images.unsplash.com/photo-1501594907352-04cda38ebc29?w=1920&q=80', // Tropical
-            'https://images.unsplash.com/photo-1770885653473-ca48b4d69173?w=1920&q=80', // Abstract
-            'https://images.unsplash.com/photo-1505142468610-359e7d316be0?w=1920&q=80', // Sunset beach
-            'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=1920&q=80', // Mountains at night
-            'https://images.unsplash.com/photo-1506781961541-e48af1845a8d?w=1920&q=80', // Snow peak
-            'https://images.unsplash.com/photo-1464207687429-7505649dae38?w=1920&q=80', // Forest path
-            'https://images.unsplash.com/photo-1519904981063-b0cf448d479e?w=1920&q=80', // City skyline
-            'https://images.unsplash.com/photo-1495562669356-e32014e67546?w=1920&q=80', // Waterfall
-            'https://images.unsplash.com/photo-1418065460487-3e41db231267?w=1920&q=80', // Canyon
-            'https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?w=1920&q=80', // Lightning storm
-            'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1920&q=80', // Snowy mountains
-            'https://images.unsplash.com/photo-1495726046308-49e7f2f0e0b0?w=1920&q=80', // Galaxy
-            'https://images.unsplash.com/photo-1454391304352-2bf4678b1a7a?w=1920&q=80', // Northern lights
-            'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1920&q=80', // Valley mist
-            'https://images.unsplash.com/photo-1470114716159-e389f8712fda?w=1920&q=80', // Autumn forest
-            'https://images.unsplash.com/photo-1500382017468-7049fae79d69?w=1920&q=80', // Beach paradise
-            'https://images.unsplash.com/photo-1464514709131-fac157c3fcc2?w=1920&q=80', // Night sky
-            'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1920&q=80', // Alpine lake
+            'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1920&q=80 ', // Mountain landscape
+            'https://images.unsplash.com/photo-1511884642898-4c92249e20b6?w=1920&q=80 ', // Ocean waves
+            'https://images.unsplash.com/photo-1518895949257-7621c3c786d7?w=1920&q=80 ', // Aurora
+            'https://images.unsplash.com/photo-1475274047050-1d0c0975c63e?w=1920&q=80 ', // Desert
+            'https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=1920&q=80 ', // Forest
+            'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=1920&q=80 ', // Lake
+            'https://images.unsplash.com/photo-1447752875215-b2761acb3c5d?w=1920&q=80 ', // Meadow
+            'https://images.unsplash.com/photo-1501594907352-04cda38ebc29?w=1920&q=80 ', // Tropical
+            'https://images.unsplash.com/photo-1770885653473-ca48b4d69173?w=1920&q=80 ', // Abstract
+            'https://images.unsplash.com/photo-1505142468610-359e7d316be0?w=1920&q=80 ', // Sunset beach
+            'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=1920&q=80 ', // Mountains at night
+            'https://images.unsplash.com/photo-1506781961541-e48af1845a8d?w=1920&q=80 ', // Snow peak
+            'https://images.unsplash.com/photo-1464207687429-7505649dae38?w=1920&q=80 ', // Forest path
+            'https://images.unsplash.com/photo-1519904981063-b0cf448d479e?w=1920&q=80 ', // City skyline
+            'https://images.unsplash.com/photo-1495562669356-e32014e67546?w=1920&q=80 ', // Waterfall
+            'https://images.unsplash.com/photo-1418065460487-3e41db231267?w=1920&q=80 ', // Canyon
+            'https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?w=1920&q=80 ', // Lightning storm
+            'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1920&q=80 ', // Snowy mountains
+            'https://images.unsplash.com/photo-1495726046308-49e7f2f0e0b0?w=1920&q=80 ', // Galaxy
+            'https://images.unsplash.com/photo-1454391304352-2bf4678b1a7a?w=1920&q=80 ', // Northern lights
+            'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1920&q=80 ', // Valley mist
+            'https://images.unsplash.com/photo-1470114716159-e389f8712fda?w=1920&q=80 ', // Autumn forest
+            'https://images.unsplash.com/photo-1500382017468-7049fae79d69?w=1920&q=80 ', // Beach paradise
+            'https://images.unsplash.com/photo-1464514709131-fac157c3fcc2?w=1920&q=80 ', // Night sky
+            'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1920&q=80 ', // Alpine lake
         ];
 
+        // Shuffle array using Fisher-Yates algorithm
+        function shuffleArray(array) {
+            const shuffled = [...array];
+            for (let i = shuffled.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            }
+            return shuffled;
+        }
+
+        // Create randomized image order
+        const shuffledImages = shuffleArray(images);
         let currentIndex = 0;
         let slides = [];
 
         // Create slide elements
-        images.forEach((imageUrl, index) => {
+        shuffledImages.forEach((imageUrl, index) => {
             const slide = document.createElement('div');
             slide.className = 'image-slide';
             slide.style.backgroundImage = `url('${imageUrl}')`;
@@ -217,7 +229,7 @@
             slides[currentIndex].classList.add('active');
         }
 
-        setInterval(nextSlide, 6000); // Change image every 6 seconds
+        setInterval(nextSlide, 30000); // Change image every 30 seconds
 
         // Search functionality
         const searchForm = document.getElementById('searchForm');
@@ -228,11 +240,10 @@
             const query = searchInput.value.trim();
             if (query) {
                 // Open search in new tab
-                window.open(`https://google.co.uk/?q=${encodeURIComponent(query)}`, '_blank');
+                location.href = 'https://google.com/search?q=' + encodeURIComponent(query);
                 searchInput.value = '';
             }
         });
     </script>
 </body>
 </html>
-
